@@ -14,7 +14,10 @@
         ".": "./dist/index.js",
         "./common": "./dist/common/index.js",
         "./feedback": "./dist/feedback/index.js",
-        "./menu": "./dist/menu/index.js"
+        "./menu": "./dist/menu/index.js",
+        "./state_plugins": "./dist/state_plugins/index.js",
+        "./state_plugins/contributor_input": "./dist/state_plugins/contributor_input/index.js",
+        "./state_plugins/tag_input": "./dist/state_plugins/tag_input/index.js"
     },
     "files": [
         "dist/",
@@ -34,6 +37,12 @@
     },
     "dependencies": {
         "fwtoolkit": "^0.1.4",
+        "prosemirror-gapcursor": "^1.3.2",
+        "prosemirror-history": "^1.3.2",
+        "prosemirror-keymap": "^1.2.2",
+        "prosemirror-model": "^1.25.0",
+        "prosemirror-state": "^1.4.3",
+        "prosemirror-view": "^1.38.1",
         "w3c-keyname": "2.2.8"
     },
     "devDependencies": {
