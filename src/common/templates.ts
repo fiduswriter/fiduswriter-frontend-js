@@ -1,8 +1,14 @@
 import {avatarTemplate} from "fwtoolkit/user"
 
 import {filterPrimaryEmail} from "./user_util.js"
+import type {BaseBodyTemplateOptions} from "../types.js"
 
-export const baseBodyTemplate = ({user, contents, hasOverview, app}) => `
+export const baseBodyTemplate = ({
+    user,
+    contents,
+    hasOverview,
+    app
+}: BaseBodyTemplateOptions): string => `
 <div id="fw-wait">
     <i class="fa fa-spinner fa-pulse"></i>
 </div>

@@ -1,8 +1,15 @@
 import {GapCursor} from "prosemirror-gapcursor"
 import {TextSelection} from "prosemirror-state"
+import type {EditorState, Selection} from "prosemirror-state"
+import type {ResolvedPos} from "prosemirror-model"
+import type {EditorView} from "prosemirror-view"
 
-export const nextSelection = (state, pos, dir) => {
-    let newSelection
+export const nextSelection = (
+    state: EditorState,
+    pos: number,
+    dir: number
+): Selection | undefined => {
+    let newSelection: Selection | undefined
     let newPos = pos
     let $newPos
 
@@ -15,7 +22,11 @@ export const nextSelection = (state, pos, dir) => {
         $newPos = state.doc.resolve(newPos)
         if ($newPos.parent.inlineContent) {
             newSelection = new TextSelection($newPos)
-        } else if (GapCursor.valid($newPos)) {
+        } else if (
+            (GapCursor as unknown as {valid($pos: ResolvedPos): boolean}).valid(
+                $newPos
+            )
+        ) {
             newSelection = new GapCursor($newPos)
         }
     }
@@ -23,7 +34,11 @@ export const nextSelection = (state, pos, dir) => {
     return newSelection
 }
 
-export const submitTag = (tagInputView, view, getPos) => {
+export const submitTag = (
+    tagInputView: EditorView,
+    view: EditorView,
+    getPos: () => number | undefined
+): void => {
     const tagState = tagInputView.state
     const selectionTo = tagState.selection.to
     const tag =

@@ -36,6 +36,19 @@ export default tseslint.config(
         }
     },
     {
+        files: ["src/**/*.ts"],
+        languageOptions: {
+            globals: {
+                ...globals.browser,
+                gettext: "readonly",
+                interpolate: "readonly",
+                staticUrl: "readonly",
+                settings: "readonly",
+                csrfToken: "readonly"
+            }
+        }
+    },
+    {
         files: ["test/**/*.js", "scripts/**/*.js"],
         languageOptions: {
             globals: {

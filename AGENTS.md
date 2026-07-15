@@ -29,7 +29,7 @@ Do **not** put in this repository:
 
 ## Technology stack
 
-- **Language:** TypeScript 6.0+ (currently still mostly JavaScript).
+- **Language:** TypeScript 6.0+.
 - **Module system:** ESM (`"type": "module"`).
 - **Build tool:** `tsc` only; no bundler is used.
 
@@ -38,10 +38,12 @@ Do **not** put in this repository:
 ```
 .
 ├── src/                  # Source files
-│   ├── index.js          # Public barrel export
+│   ├── index.ts          # Public barrel export
 │   ├── common/           # Shared page templates and utilities
 │   ├── feedback/         # Feedback tab component
-│   └── menu/             # Site navigation component
+│   ├── menu/             # Site navigation component
+│   ├── plugins/          # Menu plugin registry
+│   └── state_plugins/    # ProseMirror state plugins and node views
 ├── dist/                 # Compiled JS, .d.ts and source maps (generated)
 ├── package.json
 ├── tsconfig.json

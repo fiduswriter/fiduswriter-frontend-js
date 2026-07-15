@@ -1,7 +1,9 @@
+import type {Email} from "../types.js"
+
 /** Pick the primary email address from a list of email objects.
  *  Falls back to the first address if no primary is marked.
  */
-export const filterPrimaryEmail = emails => {
+export const filterPrimaryEmail = (emails: Email[]): string => {
     const primaryEmails = emails.filter(email => email.primary)
     if (!primaryEmails.length) {
         if (emails.length) {

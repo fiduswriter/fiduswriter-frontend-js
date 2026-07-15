@@ -3,15 +3,18 @@ import {keymap} from "prosemirror-keymap"
 import {Schema} from "prosemirror-model"
 import {EditorState, NodeSelection, TextSelection} from "prosemirror-state"
 import {EditorView} from "prosemirror-view"
+import type {Node, NodeSpec} from "prosemirror-model"
+import type {Command, Transaction} from "prosemirror-state"
 
 import {nextSelection, submitTag} from "./helpers.js"
 import {pastePlugin, placeholderPlugin} from "./tag_editor_plugins.js"
+import type {CreateTagEditor, GetNode, GetPos, TagInputRefs} from "../../types.js"
 
 // WeakMap to store tag input references for access from the plugin
-export const tagInputReferences = new WeakMap()
+export const tagInputReferences = new WeakMap<HTMLElement, TagInputRefs>()
 
-const doc = {content: "tag"},
-    tag = {
+const doc: NodeSpec = {content: "tag"},
+    tag: NodeSpec = {
         content: "inline*",
         parseDOM: [{tag: "div.tag-input-editor"}],
         toDOM() {
@@ -24,14 +27,20 @@ const doc = {content: "tag"},
             ]
         }
     },
-    text = {group: "inline"}
+    text: NodeSpec = {group: "inline"}
 
 const schema = new Schema({
     nodes: {doc, tag, text},
     marks: {}
 })
 
-const ArrowLeft = (state, dispatch, getNode, view, getPos) => {
+const ArrowLeft = (
+    state: EditorState,
+    dispatch: (tr: Transaction) => void,
+    getNode: GetNode,
+    view: EditorView,
+    getPos: GetPos
+): boolean => {
     // If we're at the leftmost position (position 1), stopEvent will handle moving out of the tag
     if (state.selection.to > 1) {
         // Inside the tag input, move caret left normally
@@ -49,7 +58,7 @@ const ArrowLeft = (state, dispatch, getNode, view, getPos) => {
         // Exit tag input to the left
         if (node.nodeSize > 2) {
             // At least one tag
-            const startPos = getPos() + node.nodeSize - 2
+            const startPos = (getPos() as number) + node.nodeSize - 2
             view.dispatch(
                 view.state.tr.setSelection(
                     NodeSelection.create(view.state.doc, startPos)
@@ -64,9 +73,15 @@ const ArrowLeft = (state, dispatch, getNode, view, getPos) => {
     }
 }
 
-const ArrowUp = (_state, _dispatch, _getNode, view, getPos) => {
+const ArrowUp = (
+    _state: EditorState,
+    _dispatch: (tr: Transaction) => void,
+    _getNode: GetNode,
+    view: EditorView,
+    getPos: GetPos
+): boolean => {
     // We jump to the section before this one.
-    const startPos = getPos()
+    const startPos = getPos() as number
 
     const newSelection = nextSelection(view.state, startPos, -1)
 
@@ -79,7 +94,13 @@ const ArrowUp = (_state, _dispatch, _getNode, view, getPos) => {
     return true
 }
 
-const ArrowRight = (state, dispatch, getNode, view, getPos) => {
+const ArrowRight = (
+    state: EditorState,
+    dispatch: (tr: Transaction) => void,
+    getNode: GetNode,
+    view: EditorView,
+    getPos: GetPos
+): boolean => {
     const docSize = state.doc.nodeSize - 3
     // If we're at the rightmost position, stopEvent will handle moving out of the tag
     if (state.selection.from < docSize) {
@@ -98,10 +119,16 @@ const ArrowRight = (state, dispatch, getNode, view, getPos) => {
     }
 }
 
-const ArrowDown = (_state, _dispatch, getNode, view, getPos) => {
+const ArrowDown = (
+    _state: EditorState,
+    _dispatch: (tr: Transaction) => void,
+    getNode: GetNode,
+    view: EditorView,
+    getPos: GetPos
+): boolean => {
     // We are at the end of the tag input. Move the cursor beyond
     const node = getNode()
-    const startPos = getPos(),
+    const startPos = getPos() as number,
         pos = startPos + node.nodeSize + 1
 
     const newSelection = nextSelection(view.state, pos, 1)
@@ -115,10 +142,10 @@ const ArrowDown = (_state, _dispatch, getNode, view, getPos) => {
     return true
 }
 
-export const createTagEditor = (view, getPos, getNode) => {
+export const createTagEditor: CreateTagEditor = (view, getPos, getNode) => {
     const dom = document.createElement("div")
     dom.classList.add("tag-input")
-    dom.setAttribute("contenteditable", false)
+    dom.setAttribute("contenteditable", "false")
     const node = getNode()
 
     const tagInputView = new EditorView(dom, {
@@ -135,22 +162,54 @@ export const createTagEditor = (view, getPos, getNode) => {
             }),
             plugins: [
                 history(),
-                placeholderPlugin(node.attrs.item_title),
+                placeholderPlugin((node.attrs as {item_title: string}).item_title),
                 pastePlugin(view),
                 keymap({
                     "Mod-z": undo,
                     "Mod-shift-z": undo,
                     "Mod-y": redo,
-                    Enter: (_state, _dispatch, tagInputView) =>
-                        submitTag(tagInputView, view, getPos),
-                    ArrowLeft: (state, dispatch, _tagInputView) =>
-                        ArrowLeft(state, dispatch, getNode, view, getPos),
-                    ArrowRight: (state, dispatch, _tagInputView) =>
-                        ArrowRight(state, dispatch, getNode, view, getPos),
-                    ArrowUp: (state, dispatch, _tagInputView) =>
-                        ArrowUp(state, dispatch, getNode, view, getPos),
-                    ArrowDown: (state, dispatch, _tagInputView) =>
-                        ArrowDown(state, dispatch, getNode, view, getPos)
+                    Enter: ((
+                        _state: EditorState,
+                        _dispatch: (tr: Transaction) => void,
+                        tagInputView: EditorView
+                    ) =>
+                        submitTag(
+                            tagInputView,
+                            view,
+                            getPos
+                        )) as unknown as Command,
+                    ArrowLeft: ((state, dispatch, _tagInputView) =>
+                        ArrowLeft(
+                            state,
+                            dispatch as (tr: Transaction) => void,
+                            getNode,
+                            view,
+                            getPos
+                        )) as Command,
+                    ArrowRight: ((state, dispatch, _tagInputView) =>
+                        ArrowRight(
+                            state,
+                            dispatch as (tr: Transaction) => void,
+                            getNode,
+                            view,
+                            getPos
+                        )) as Command,
+                    ArrowUp: ((state, dispatch, _tagInputView) =>
+                        ArrowUp(
+                            state,
+                            dispatch as (tr: Transaction) => void,
+                            getNode,
+                            view,
+                            getPos
+                        )) as Command,
+                    ArrowDown: ((state, dispatch, _tagInputView) =>
+                        ArrowDown(
+                            state,
+                            dispatch as (tr: Transaction) => void,
+                            getNode,
+                            view,
+                            getPos
+                        )) as Command
                 })
             ]
         }),
@@ -168,9 +227,11 @@ export const createTagEditor = (view, getPos, getNode) => {
                 }, 1)
             },
             focus: (tagInputView, _event) => {
-                const startPos = getPos(),
+                const startPos = getPos() as number,
                     pos =
-                        startPos + view.state.doc.nodeAt(startPos).nodeSize - 1,
+                        startPos +
+                        (view.state.doc.nodeAt(startPos) as Node).nodeSize -
+                        1,
                     $pos = view.state.doc.resolve(pos)
                 view.dispatch(
                     view.state.tr.setSelection(new TextSelection($pos))
@@ -178,7 +239,7 @@ export const createTagEditor = (view, getPos, getNode) => {
                 tagInputView.focus()
             }
         },
-        handleTextInput: (_view, _from, _to, text) => {
+        handleTextInput: (_view, _from, _to, text): boolean | void => {
             if ([",", ".", ";"].includes(text)) {
                 submitTag(tagInputView, view, getPos)
                 return true

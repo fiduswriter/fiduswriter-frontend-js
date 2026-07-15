@@ -1,30 +1,50 @@
-import {AddButton} from "./add_button.js"
+import type {Node} from "prosemirror-model"
+import type {EditorView, NodeView} from "prosemirror-view"
 
-export class ContributorsPartView {
-    constructor(node, view, getPos, options = {}) {
+import {AddButton} from "./add_button.js"
+import type {
+    AddButtonLike,
+    ContributorsPartOptions,
+    GetPos,
+    PartNodeAttrs
+} from "../../types.js"
+
+export class ContributorsPartView implements NodeView {
+    node: Node
+    view: EditorView
+    getPos: GetPos
+    options: ContributorsPartOptions
+    idTypes: string[]
+    dom: HTMLElement
+    contentDOM: HTMLElement
+    addButton?: AddButtonLike
+
+    constructor(
+        node: Node,
+        view: EditorView,
+        getPos: GetPos,
+        options: ContributorsPartOptions = {}
+    ) {
         this.node = node
         this.view = view
         this.getPos = getPos
         this.options = options
         this.idTypes =
-            (view.state &&
-                view.state.doc &&
-                view.state.doc.attrs &&
-                view.state.doc.attrs.id_types) ||
-            []
+            (view.state?.doc?.attrs?.id_types as string[] | undefined) || []
         this.dom = document.createElement("div")
         this.dom.classList.add("doc-part")
         this.dom.classList.add(`doc-${this.node.type.name}`)
-        this.dom.classList.add(`doc-${this.node.attrs.id}`)
-        if (node.attrs.hidden) {
-            this.dom.dataset.hidden = true
+        this.dom.classList.add(`doc-${(this.node.attrs as PartNodeAttrs).id}`)
+        if ((this.node.attrs as PartNodeAttrs).hidden) {
+            this.dom.dataset.hidden = "true"
         }
 
         this.contentDOM = document.createElement("span")
         this.contentDOM.classList.add("contributors-inner")
-        this.contentDOM.contentEditable = node.attrs.locking !== "fixed"
+        this.contentDOM.contentEditable =
+            (this.node.attrs as PartNodeAttrs).locking !== "fixed" ? "true" : "false"
         this.dom.appendChild(this.contentDOM)
-        if (node.attrs.locking !== "fixed") {
+        if ((this.node.attrs as PartNodeAttrs).locking !== "fixed") {
             const AddButtonClass = options.AddButton || AddButton
             this.addButton = new AddButtonClass(
                 this.dom,
@@ -39,12 +59,15 @@ export class ContributorsPartView {
             this.addButton.init()
         }
 
-        if (node.attrs.deleted && options.addDeletedPartWidget) {
+        if (
+            (this.node.attrs as PartNodeAttrs).deleted &&
+            options.addDeletedPartWidget
+        ) {
             options.addDeletedPartWidget(this.dom, view, getPos)
         }
     }
 
-    stopEvent(event) {
+    stopEvent(event: Event): boolean {
         // Trap events for addButton
         if (["click", "mousedown"].includes(event.type)) {
             return false
@@ -57,29 +80,33 @@ export class ContributorsPartView {
         }
     }
 
-    update(node, _decorations, _innerDecorations) {
+    update(
+        node: Node,
+        _decorations?: readonly unknown[],
+        _innerDecorations?: unknown
+    ): boolean {
         this.node = node
-        if (node.attrs.hidden) {
-            this.dom.dataset.hidden = true
+        if ((this.node.attrs as PartNodeAttrs).hidden) {
+            this.dom.dataset.hidden = "true"
         } else {
             delete this.dom.dataset.hidden
         }
         return true
     }
 
-    getNode() {
+    getNode(): Node {
         return this.node
     }
 
-    setSelection(anchor, head, _root) {
+    setSelection(anchor: number, head: number, _root?: Document | ShadowRoot): void {
         if (anchor === head && this.view.hasFocus()) {
             // We must be in last position.
             // Activate the tag input tag editor.
-            this.addButton.focus()
+            this.addButton?.focus()
         }
     }
 
-    ignoreMutation(_record) {
+    ignoreMutation(_record: MutationRecord | unknown): boolean {
         if (this.addButton?.hasFocus()) {
             return true
         }

@@ -1,14 +1,15 @@
 import {Plugin} from "prosemirror-state"
 import {Decoration, DecorationSet} from "prosemirror-view"
+import type {EditorView} from "prosemirror-view"
 
-export const placeholderPlugin = nodeTitle =>
+export const placeholderPlugin = (nodeTitle: string) =>
     new Plugin({
         props: {
-            decorations: state => {
+            decorations: (state): DecorationSet | undefined => {
                 const doc = state.doc
                 if (
                     doc.childCount === 1 &&
-                    doc.firstChild.isTextblock &&
+                    doc.firstChild?.isTextblock &&
                     doc.firstChild.content.size === 0
                 ) {
                     const placeHolder = document.createElement("span")
@@ -23,22 +24,25 @@ export const placeholderPlugin = nodeTitle =>
                         Decoration.widget(1, placeHolder)
                     ])
                 }
+                return undefined
             }
         }
     })
 
-export const pastePlugin = editorView => {
+export const pastePlugin = (editorView: EditorView) => {
     return new Plugin({
         props: {
             handleDOMEvents: {
                 paste(_view, event) {
-                    const html = event.clipboardData.getData("text/html"),
-                        text = event.clipboardData.getData("text/plain"),
+                    const clipboardEvent = event as ClipboardEvent
+                    const clipboardData = clipboardEvent.clipboardData as DataTransfer
+                    const html = clipboardData.getData("text/html"),
+                        text = clipboardData.getData("text/plain"),
                         slice = text
                             .split(/[,;.]/)
                             .map(item => item.trim())
                             .filter(item => item.length)
-                    let tags
+                    let tags: string[]
                     if (text && !html) {
                         tags = slice
                     } else {
@@ -52,7 +56,7 @@ export const pastePlugin = editorView => {
                         pasteHTML.innerHTML = html
                         tags = Array.from(
                             pasteHTML.querySelectorAll("span.tag")
-                        ).map(tag => tag.textContent)
+                        ).map(tag => tag.textContent as string)
                     }
                     if (!tags.length) {
                         return

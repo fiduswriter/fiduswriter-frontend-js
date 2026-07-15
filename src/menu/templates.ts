@@ -1,4 +1,12 @@
-export const headerNavTemplate = ({navItems, getAccessKeyHTML}) =>
+import type {NavItem} from "../types.js"
+
+export const headerNavTemplate = ({
+    navItems,
+    getAccessKeyHTML
+}: {
+    navItems: NavItem[]
+    getAccessKeyHTML: (text: string, keys?: string) => string
+}): string =>
     `<div class="fw-container fw-nav-container">
     ${navItems
         .map(

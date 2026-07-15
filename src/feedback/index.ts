@@ -5,16 +5,18 @@ import {ensureCSS, post} from "fwtoolkit"
 // This is also where browser sniffing happens to prevent still unsupported browsers from logging in.
 
 export class FeedbackTab {
+    previousActiveElement: HTMLElement | null
+
     constructor() {
         this.previousActiveElement = null
     }
 
-    init() {
+    init(): void {
         this.render()
         this.bind()
     }
 
-    render() {
+    render(): void {
         document.body.insertAdjacentHTML(
             "beforeend",
             `<div class="feedback-panel" tole="dialog" aria-modal="true" aria-labelledby="feedback-title">
@@ -61,39 +63,50 @@ export class FeedbackTab {
         ensureCSS(staticUrl("css/feedback/feedback.css"))
     }
 
-    bind() {
-        document
-            .querySelector("a.feedback-tab")
-            .addEventListener("click", event => {
+    bind(): void {
+        ;(document.querySelector("a.feedback-tab") as HTMLElement).addEventListener(
+            "click",
+            event => {
                 event.preventDefault()
                 this.openFeedbackPanel()
-            })
+            }
+        )
 
-        document
-            .querySelector("#close-feedback")
-            .addEventListener("click", event => {
-                event.preventDefault()
-                this.closeFeedbackPanel()
-            })
+        ;(
+            document.querySelector("#close-feedback") as HTMLElement
+        ).addEventListener("click", event => {
+            event.preventDefault()
+            this.closeFeedbackPanel()
+        })
 
-        document
-            .querySelector("#feedbackbutton")
-            .addEventListener("click", () => this.sendFeedback())
+        ;(
+            document.querySelector("#feedbackbutton") as HTMLElement
+        ).addEventListener("click", () => this.sendFeedback())
     }
 
-    openFeedbackPanel() {
-        this.previousActiveElement = document.activeElement
-        const panelEl = document.querySelector(".feedback-panel")
+    openFeedbackPanel(): void {
+        this.previousActiveElement = document.activeElement as HTMLElement | null
+        const panelEl = document.querySelector(".feedback-panel") as HTMLElement
         panelEl.style.display = "block"
-        document.querySelector("textarea#fw-message").focus()
+        ;(
+            document.querySelector("textarea#fw-message") as HTMLTextAreaElement
+        ).focus()
         panelEl.addEventListener("keydown", this.handleKeyDown)
     }
 
-    sendFeedback() {
-        const messageEl = document.querySelector("textarea#fw-message"),
-            closeFeedbackEl = document.querySelector("#close-feedback"),
-            feedbackFormEl = document.querySelector("#feedback-form"),
-            responseEl = document.querySelector("#response-message")
+    sendFeedback(): void {
+        const messageEl = document.querySelector(
+                "textarea#fw-message"
+            ) as HTMLTextAreaElement,
+            closeFeedbackEl = document.querySelector(
+                "#close-feedback"
+            ) as HTMLElement,
+            feedbackFormEl = document.querySelector(
+                "#feedback-form"
+            ) as HTMLElement,
+            responseEl = document.querySelector(
+                "#response-message"
+            ) as HTMLElement
         if (!messageEl.value.length) {
             return
         }
@@ -111,28 +124,27 @@ export class FeedbackTab {
                 messageEl.value = ""
                 closeFeedbackEl.style.display = "block"
             })
-        return false
     }
 
-    handleKeyDown(event) {
+    handleKeyDown(event: KeyboardEvent): void {
         // Trap Tab key within the feedback panel.
         const FOCUSABLE_SELECTORS = "button, textarea"
         if (event.key !== "Tab") {
             return
         }
         const focusableEls = Array.from(
-            document
-                .querySelector(".feedback-panel")
-                .querySelectorAll(FOCUSABLE_SELECTORS)
+            (document.querySelector(".feedback-panel") as HTMLElement).querySelectorAll(
+                FOCUSABLE_SELECTORS
+            )
         )
             // Filter only visible elements
-            .filter(el => el.offsetParent !== null)
+            .filter(el => (el as HTMLElement).offsetParent !== null)
 
         if (focusableEls.length === 0) {
             return
         }
-        const firstEl = focusableEls[0]
-        const lastEl = focusableEls[focusableEls.length - 1]
+        const firstEl = focusableEls[0] as HTMLElement
+        const lastEl = focusableEls[focusableEls.length - 1] as HTMLElement
 
         if (event.shiftKey) {
             // If Shift+Tab and the first element is active, move focus to the last element.
@@ -149,11 +161,15 @@ export class FeedbackTab {
         }
     }
 
-    closeFeedbackPanel() {
-        const panelEl = document.querySelector(".feedback-panel")
+    closeFeedbackPanel(): void {
+        const panelEl = document.querySelector(".feedback-panel") as HTMLElement
         panelEl.style.display = "none"
-        document.querySelector("#feedback-form").style.visibility = "visible"
-        document.querySelector("#response-message").style.display = "none"
+        ;(
+            document.querySelector("#feedback-form") as HTMLElement
+        ).style.visibility = "visible"
+        ;(
+            document.querySelector("#response-message") as HTMLElement
+        ).style.display = "none"
 
         // Remove the keydown event listener that was added for focus trapping.
         panelEl.removeEventListener("keydown", this.handleKeyDown)

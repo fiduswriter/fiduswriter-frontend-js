@@ -10,14 +10,36 @@
     "author": "Johannes Wilm",
     "type": "module",
     "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
     "exports": {
-        ".": "./dist/index.js",
-        "./common": "./dist/common/index.js",
-        "./feedback": "./dist/feedback/index.js",
-        "./menu": "./dist/menu/index.js",
-        "./state_plugins": "./dist/state_plugins/index.js",
-        "./state_plugins/contributor_input": "./dist/state_plugins/contributor_input/index.js",
-        "./state_plugins/tag_input": "./dist/state_plugins/tag_input/index.js"
+        ".": {
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
+        },
+        "./common": {
+            "types": "./dist/common/index.d.ts",
+            "default": "./dist/common/index.js"
+        },
+        "./feedback": {
+            "types": "./dist/feedback/index.d.ts",
+            "default": "./dist/feedback/index.js"
+        },
+        "./menu": {
+            "types": "./dist/menu/index.d.ts",
+            "default": "./dist/menu/index.js"
+        },
+        "./state_plugins": {
+            "types": "./dist/state_plugins/index.d.ts",
+            "default": "./dist/state_plugins/index.js"
+        },
+        "./state_plugins/contributor_input": {
+            "types": "./dist/state_plugins/contributor_input/index.d.ts",
+            "default": "./dist/state_plugins/contributor_input/index.js"
+        },
+        "./state_plugins/tag_input": {
+            "types": "./dist/state_plugins/tag_input/index.d.ts",
+            "default": "./dist/state_plugins/tag_input/index.js"
+        }
     },
     "files": [
         "dist/",

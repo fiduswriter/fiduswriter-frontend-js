@@ -2,11 +2,19 @@ import {keyName} from "w3c-keyname"
 
 import {dropdownSelect, whenReady} from "fwtoolkit"
 import {headerNavTemplate} from "./templates.js"
+import type {App, MenuPlugins, NavItem, SiteMenuLike} from "../types.js"
 
 // Bindings for the top menu on overview pages
 
-export class SiteMenu {
-    constructor(app, activeItem) {
+export class SiteMenu implements SiteMenuLike {
+    app: App
+    activeItem: string | undefined
+    navItems: NavItem[]
+    listeners: {onKeydown?: (event: KeyboardEvent) => void}
+    keyboardShortcuts: Map<string, NavItem>
+    plugins?: Record<string, {init(): void}>
+
+    constructor(app: App, activeItem?: string) {
         this.app = app
         this.activeItem = activeItem
         this.navItems = [
@@ -39,7 +47,7 @@ export class SiteMenu {
         this.keyboardShortcuts = new Map()
     }
 
-    init() {
+    init(): void {
         this.activatePlugins()
         this.setupKeyboardShortcuts()
         const currentActive = this.navItems.find(
@@ -57,7 +65,7 @@ export class SiteMenu {
         })
     }
 
-    setupKeyboardShortcuts() {
+    setupKeyboardShortcuts(): void {
         this.navItems.forEach(navItem => {
             if (navItem.keys) {
                 this.keyboardShortcuts.set(navItem.keys.toLowerCase(), navItem)
@@ -65,12 +73,12 @@ export class SiteMenu {
         })
     }
 
-    bindKeyboardNavigation() {
+    bindKeyboardNavigation(): void {
         this.listeners.onKeydown = event => this.onKeydown(event)
         document.body.addEventListener("keydown", this.listeners.onKeydown)
     }
 
-    onKeydown(event) {
+    onKeydown(event: KeyboardEvent): void {
         const name = keyName(event)
 
         if (event.altKey) {
@@ -83,9 +91,11 @@ export class SiteMenu {
                 return
             }
         }
-        const headerNav = document.getElementById("header-nav")
-        const siteMenuItems = headerNav.querySelectorAll(".fw-nav-item a")
-        const currentFocus = document.activeElement
+        const headerNav = document.getElementById("header-nav") as HTMLElement
+        const siteMenuItems: HTMLElement[] = Array.from(
+            headerNav.querySelectorAll(".fw-nav-item a")
+        )
+        const currentFocus = document.activeElement as HTMLElement
         const overviewMenu = document.getElementById("fw-overview-menu")
         const isInSiteMenu = headerNav.contains(currentFocus)
         const isInOverviewDropdown = overviewMenu
@@ -98,7 +108,7 @@ export class SiteMenu {
 
         let currentIndex = -1
         if (isInSiteMenu) {
-            currentIndex = parseInt(currentFocus.dataset.index)
+            currentIndex = parseInt(currentFocus.dataset.index ?? "-1")
         }
         switch (name) {
             case "ArrowLeft": {
@@ -132,7 +142,7 @@ export class SiteMenu {
                     )
 
                     if (firstOverviewItem) {
-                        firstOverviewItem.focus()
+                        ;(firstOverviewItem as HTMLElement).focus()
                     }
                 }
                 break
@@ -155,28 +165,33 @@ export class SiteMenu {
             case " ": {
                 if (isInSiteMenu) {
                     event.preventDefault()
-                    currentFocus.click()
+                    ;(currentFocus as HTMLElement).click()
                 }
                 break
             }
         }
     }
 
-    sortMenu() {
+    sortMenu(): void {
         this.navItems.sort((a, b) => a.order - b.order)
     }
 
-    renderMenu() {
-        const headerNav = document.getElementById("header-nav")
+    renderMenu(): void {
+        const headerNav = document.getElementById("header-nav") as HTMLElement
         headerNav.innerHTML = headerNavTemplate({
             navItems: this.navItems,
             getAccessKeyHTML: (text, keys) => this.getAccessKeyHTML(text, keys)
         })
     }
 
-    bindPreferencePullDown() {
-        dropdownSelect(document.getElementById("user-preferences-pulldown"), {
-            button: document.getElementById("preferences-btn"),
+    bindPreferencePullDown(): void {
+        const pulldown = document.getElementById(
+            "user-preferences-pulldown"
+        ) as HTMLSelectElement
+        const button =
+            document.getElementById("preferences-btn") || false
+        dropdownSelect(pulldown, {
+            button,
             onChange: value => {
                 switch (value) {
                     case "profile":
@@ -195,13 +210,12 @@ export class SiteMenu {
                             }
                         }
                         import("fwtoolkit/network").then(({post}) =>
-                            post("/api/user/logout/").then(
-                                () =>
-                                    (window.location =
-                                        this.app.routes[""].app === "document"
-                                            ? "/"
-                                            : "/documents/")
-                            )
+                            post("/api/user/logout/").then(() => {
+                                window.location.href =
+                                    this.app.routes[""].app === "document"
+                                        ? "/"
+                                        : "/documents/"
+                            })
                         )
                         break
                 }
@@ -209,13 +223,14 @@ export class SiteMenu {
         })
     }
 
-    activatePlugins() {
+    activatePlugins(): void {
         // Add plugins, but only once.
         if (!this.plugins) {
             this.plugins = {}
         }
+        const pluginInstances = this.plugins
 
-        const plugins = this.app.menuPlugins || []
+        const plugins: MenuPlugins = this.app.menuPlugins || []
 
         plugins.forEach(([app, plugin]) => {
             if (!this.app.settings.APPS.includes(app)) {
@@ -223,19 +238,22 @@ export class SiteMenu {
             }
             Object.values(plugin).forEach(pluginExport => {
                 if (typeof pluginExport === "function") {
-                    this.plugins[pluginExport.name] = new pluginExport(this)
-                    this.plugins[pluginExport.name].init()
+                    pluginInstances[pluginExport.name] = new pluginExport(this)
+                    pluginInstances[pluginExport.name].init()
                 }
             })
         })
     }
 
-    destroy() {
-        document.body.removeEventListener("keydown", this.listeners.onKeydown)
+    destroy(): void {
+        document.body.removeEventListener(
+            "keydown",
+            this.listeners.onKeydown as EventListener
+        )
         this.listeners = {}
     }
 
-    getAccessKeyHTML(text, accessKey) {
+    getAccessKeyHTML(text: string, accessKey?: string): string {
         if (!accessKey) {
             return text
         }
