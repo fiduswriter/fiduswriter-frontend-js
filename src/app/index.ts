@@ -192,7 +192,7 @@ export class App {
                         ({BibliographyOverview}: any) =>
                             new BibliographyOverview(
                                 {
-                                    app: this.config,
+                                    app: this.config.app,
                                     container
                                 } as any,
                                 this.bibliographyOverviewPlugins as any
@@ -322,7 +322,7 @@ export class App {
                     ) as HTMLElement
                     return Promise.resolve(
                         new ImageOverview({
-                            app: this.config,
+                            app: this.config.app,
                             container
                         } as any)
                     )
