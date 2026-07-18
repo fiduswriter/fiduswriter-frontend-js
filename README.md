@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="logo.svg" alt="@fiduswriter/common" width="100" height="100">
+  <img src="logo.svg" alt="@fiduswriter/frontend" width="100" height="100">
 </p>
 
-<h1 align="center">@fiduswriter/common</h1>
+<h1 align="center">@fiduswriter/frontend</h1>
 
 <p align="center">Fidus Writer shared page chrome and utilities</p>
 
@@ -40,15 +40,15 @@ TypeScript declarations in `dist/` for the full API.
 ## Installation
 
 ```bash
-npm install @fiduswriter/common
+npm install @fiduswriter/frontend
 ```
 
 ## Usage
 
 ```ts
-import {baseBodyTemplate, FeedbackTab, SiteMenu} from "@fiduswriter/common"
-import {contributorInputPlugin} from "@fiduswriter/common/state_plugins/contributor_input"
-import {tagInputPlugin} from "@fiduswriter/common/state_plugins/tag_input"
+import {baseBodyTemplate, FeedbackTab, SiteMenu} from "@fiduswriter/frontend"
+import {contributorInputPlugin} from "@fiduswriter/frontend/state_plugins/contributor_input"
+import {tagInputPlugin} from "@fiduswriter/frontend/state_plugins/tag_input"
 ```
 
 ## Development

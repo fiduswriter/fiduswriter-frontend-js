@@ -1,0 +1,149 @@
+// API connector interfaces for all API-calling modules.
+// Each interface defines the methods that a module uses to talk to the backend.
+// The default Django implementation will call postJson/getJson with hardcoded URLs.
+// The interfaces exist so consuming apps can swap in alternative implementations.
+
+// ---- ConfigApi ----
+
+export interface ConfigApi {
+    getConfiguration(): Promise<Record<string, unknown>>
+}
+
+// ---- DocumentListApi ----
+
+export interface DocumentListApi {
+    getDocumentList(): Promise<Record<string, unknown>>
+    getDocumentListExtra(ids: number[]): Promise<Record<string, unknown>>
+    deleteDocument(data: {id?: number; ids?: number[]}): Promise<Record<string, unknown>>
+    moveDocument(data: {ids: number[]; parent?: number; parent_id?: number}): Promise<Record<string, unknown>>
+    getEncryptionKeys(): Promise<Record<string, unknown>>
+}
+
+// ---- DocumentImportApi ----
+
+export interface DocumentImportApi {
+    createDoc(data: Record<string, unknown>, files?: Record<string, unknown>): Promise<Record<string, unknown>>
+    saveImage(
+        data: Record<string, unknown>,
+        files: Record<string, unknown>
+    ): Promise<Record<string, unknown>>
+    saveE2EEImage(
+        data: Record<string, unknown>,
+        files: Record<string, unknown>
+    ): Promise<Record<string, unknown>>
+    saveDocument(data: Record<string, unknown>): Promise<Record<string, unknown>>
+    getTemplate(importId: string): Promise<Record<string, unknown>>
+}
+
+// ---- UserProfileApi ----
+
+export interface UserProfileApi {
+    save(data: Record<string, unknown>): Promise<unknown>
+    updatePreferences(data: Record<string, unknown>): Promise<unknown>
+    avatarUpload(files: Record<string, unknown>): Promise<unknown>
+    avatarDelete(): Promise<unknown>
+    passwordChange(data: Record<string, unknown>): Promise<{json: Record<string, unknown>; status: number}>
+    emailAdd(data: Record<string, unknown>): Promise<{json: Record<string, unknown>; status: number}>
+    emailDelete(data: Record<string, unknown>): Promise<unknown>
+    emailPrimary(data: Record<string, unknown>): Promise<unknown>
+    deleteUser(data: Record<string, unknown>): Promise<Response>
+    getSocialAccounts(): Promise<unknown>
+    deleteSocialAccount(data: Record<string, unknown>): Promise<unknown>
+    getConfirmKeyData(data: Record<string, unknown>): Promise<{json: Record<string, unknown>}>
+    confirmEmail(key: string): Promise<unknown>
+}
+
+// ---- AuthApi ----
+
+export interface AuthApi {
+    login(data: Record<string, unknown>): Promise<{json: Record<string, unknown>; status: number}>
+    signup(data: Record<string, unknown>): Promise<{json: Record<string, unknown>}>
+    passwordReset(data: {email: string}): Promise<unknown>
+    passwordResetKeyGet(key: string): Promise<{url: string}>
+    passwordResetKeyPost(url: string, data: Record<string, unknown>): Promise<unknown>
+    twoFactorSetup(): Promise<{json: Record<string, unknown>}>
+    twoFactorVerify(data: Record<string, unknown>): Promise<{json: Record<string, unknown>}>
+    twoFactorLogin(data: Record<string, unknown>): Promise<{json: Record<string, unknown>}>
+    twoFactorDisable(): Promise<{json: Record<string, unknown>}>
+    twoFactorStatus(): Promise<{json: {status: string; enabled: boolean}}>
+}
+
+// ---- ContactsApi ----
+
+export interface ContactsApi {
+    list(): Promise<{json: Record<string, unknown>}>
+    delete(data: Record<string, unknown>): Promise<{status: number}>
+    add(data: {user_string: string}): Promise<{json: Record<string, unknown>; status: number}>
+    accept(data: Record<string, unknown>): Promise<{json: Record<string, unknown>; status: number}>
+    decline(data: Record<string, unknown>): Promise<{status: number}>
+    invite(data: {key: string}): Promise<{json: Record<string, unknown>}>
+}
+
+// ---- DocumentTemplateApi ----
+
+export interface DocumentTemplateApi {
+    list(): Promise<Record<string, unknown>>
+    get(data: {id: number}): Promise<{json: Record<string, unknown>}>
+    save(data: Record<string, unknown>): Promise<unknown>
+    delete(data: {id: number}): Promise<{json: Record<string, unknown>}>
+    create(data: Record<string, unknown>, files?: Record<string, unknown>): Promise<unknown>
+    copy(data: {id: number; title: string}): Promise<{json: Record<string, unknown>}>
+}
+
+// ---- FlatPageApi ----
+
+export interface FlatPageApi {
+    get(key: string): Promise<Record<string, unknown>>
+}
+
+// ---- SystemMessageApi ----
+
+export interface SystemMessageApi {
+    get(): Promise<Record<string, unknown>>
+    send(data: Record<string, unknown>): Promise<Record<string, unknown>>
+}
+
+// ---- ErrorHookApi ----
+
+export interface ErrorHookApi {
+    send(data: Record<string, unknown>): Promise<unknown>
+}
+
+// ---- MaintenanceApi ----
+
+export interface MaintenanceApi {
+    getAllOldDocs(): Promise<{json: {docs: string}}>
+    getUserBibList(data: {user_id: number}): Promise<{json: {bibList: Array<Record<string, unknown>>}}>
+    saveDoc(data: Record<string, unknown>): Promise<unknown>
+    addImagesToDoc(data: Record<string, unknown>): Promise<unknown>
+    getAllTemplateIds(): Promise<{json: {template_ids: number[]}}>
+    getTemplateBase(data: {id: number}): Promise<{json: Record<string, unknown>}>
+    saveTemplate(data: Record<string, unknown>): Promise<unknown>
+    getAllRevisionIds(): Promise<{json: {revision_ids: number[]}}>
+    getRevision(id: number): Promise<Response>
+    updateRevision(id: number, blob: Blob): Promise<unknown>
+}
+
+// ---- RevisionApi ----
+
+export interface RevisionApi {
+    getRevisionBlob(id: number): Promise<Blob>
+    deleteRevision(data: {id: number}): Promise<unknown>
+}
+
+// ---- Bundled connectors ----
+
+export interface ApiConnectors {
+    documentList: DocumentListApi
+    documentImport: DocumentImportApi
+    userProfile: UserProfileApi
+    auth: AuthApi
+    contacts: ContactsApi
+    documentTemplate: DocumentTemplateApi
+    flatPage: FlatPageApi
+    systemMessage: SystemMessageApi
+    errorHook: ErrorHookApi
+    config: ConfigApi
+    maintenance: MaintenanceApi
+    revision: RevisionApi
+}

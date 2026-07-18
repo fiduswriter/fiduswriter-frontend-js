@@ -1,13 +1,13 @@
-# AGENTS.md — @fiduswriter/common
+# AGENTS.md — @fiduswriter/frontend
 
 ## Project overview
 
-`@fiduswriter/common` is a JavaScript/TypeScript library that holds Fidus
+`@fiduswriter/frontend` is a JavaScript/TypeScript library that holds Fidus
 Writer-specific utilities and UI chrome that are reused between the standalone
 Fidus Writer applications (editor, bibliography manager) but are not generic
 enough to live in `fwtoolkit`.
 
-- Package name: `@fiduswriter/common`
+- Package name: `@fiduswriter/frontend`
 - License: `AGPL-3.0`
 - Repository: `https://codeberg.org/fiduswriter/fiduswriter-common.git`
 - Author: Johannes Wilm

@@ -1,5 +1,5 @@
 {
-  "name": "@fiduswriter/common",
+  "name": "@fiduswriter/frontend",
   "version": "0.1.7",
   "description": "Fidus Writer-specific shared utilities and UI chrome",
   "repository": {
@@ -28,17 +28,137 @@
       "types": "./dist/menu/index.d.ts",
       "default": "./dist/menu/index.js"
     },
-    "./state_plugins": {
-      "types": "./dist/state_plugins/index.d.ts",
-      "default": "./dist/state_plugins/index.js"
+    "./indexed_db": {
+      "types": "./dist/indexed_db/index.d.ts",
+      "default": "./dist/indexed_db/index.js"
     },
-    "./state_plugins/contributor_input": {
-      "types": "./dist/state_plugins/contributor_input/index.d.ts",
-      "default": "./dist/state_plugins/contributor_input/index.js"
+    "./prelogin": {
+      "types": "./dist/prelogin/index.d.ts",
+      "default": "./dist/prelogin/index.js"
     },
-    "./state_plugins/tag_input": {
-      "types": "./dist/state_plugins/tag_input/index.d.ts",
-      "default": "./dist/state_plugins/tag_input/index.js"
+    "./prelogin/templates": {
+      "types": "./dist/prelogin/templates.d.ts",
+      "default": "./dist/prelogin/templates.js"
+    },
+    "./pages/404": {
+      "types": "./dist/pages/404.d.ts",
+      "default": "./dist/pages/404.js"
+    },
+    "./pages/offline": {
+      "types": "./dist/pages/offline.d.ts",
+      "default": "./dist/pages/offline.js"
+    },
+    "./pages/setup": {
+      "types": "./dist/pages/setup.d.ts",
+      "default": "./dist/pages/setup.js"
+    },
+    "./pages/flatpage": {
+      "types": "./dist/pages/flatpage.d.ts",
+      "default": "./dist/pages/flatpage.js"
+    },
+    "./admin_console": {
+      "types": "./dist/admin_console/index.d.ts",
+      "default": "./dist/admin_console/index.js"
+    },
+    "./error_hook": {
+      "types": "./dist/error_hook/index.d.ts",
+      "default": "./dist/error_hook/index.js"
+    },
+    "./documents/overview": {
+      "types": "./dist/documents/overview/index.d.ts",
+      "default": "./dist/documents/overview/index.js"
+    },
+    "./documents/tools": {
+      "types": "./dist/documents/tools.d.ts",
+      "default": "./dist/documents/tools.js"
+    },
+    "./documents/importer/register": {
+      "types": "./dist/documents/importer/register.d.ts",
+      "default": "./dist/documents/importer/register.js"
+    },
+    "./documents/importer/native": {
+      "types": "./dist/documents/importer/native/index.d.ts",
+      "default": "./dist/documents/importer/native/index.js"
+    },
+    "./documents/importer/native/import": {
+      "types": "./dist/documents/importer/native/import.d.ts",
+      "default": "./dist/documents/importer/native/import.js"
+    },
+    "./documents/importer/native/file": {
+      "types": "./dist/documents/importer/native/file.d.ts",
+      "default": "./dist/documents/importer/native/file.js"
+    },
+    "./documents/importer/docx": {
+      "types": "./dist/documents/importer/docx/index.d.ts",
+      "default": "./dist/documents/importer/docx/index.js"
+    },
+    "./documents/importer/odt": {
+      "types": "./dist/documents/importer/odt/index.d.ts",
+      "default": "./dist/documents/importer/odt/index.js"
+    },
+    "./documents/importer/pandoc": {
+      "types": "./dist/documents/importer/pandoc/index.d.ts",
+      "default": "./dist/documents/importer/pandoc/index.js"
+    },
+    "./documents/revisions": {
+      "types": "./dist/documents/revisions/index.d.ts",
+      "default": "./dist/documents/revisions/index.js"
+    },
+    "./user/profile": {
+      "types": "./dist/user/profile/index.d.ts",
+      "default": "./dist/user/profile/index.js"
+    },
+    "./user/auth/login": {
+      "types": "./dist/user/auth/login.d.ts",
+      "default": "./dist/user/auth/login.js"
+    },
+    "./user/auth/signup": {
+      "types": "./dist/user/auth/signup.d.ts",
+      "default": "./dist/user/auth/signup.js"
+    },
+    "./user/auth/password-reset": {
+      "types": "./dist/user/auth/password_reset_request.d.ts",
+      "default": "./dist/user/auth/password_reset_request.js"
+    },
+    "./user/auth/password-reset-change": {
+      "types": "./dist/user/auth/password_reset_change.d.ts",
+      "default": "./dist/user/auth/password_reset_change.js"
+    },
+    "./user/auth/email-confirm": {
+      "types": "./dist/user/auth/email_confirm.d.ts",
+      "default": "./dist/user/auth/email_confirm.js"
+    },
+    "./user/auth/two-factor": {
+      "types": "./dist/user/auth/two_factor.d.ts",
+      "default": "./dist/user/auth/two_factor.js"
+    },
+    "./user/contacts": {
+      "types": "./dist/user/contacts/index.d.ts",
+      "default": "./dist/user/contacts/index.js"
+    },
+    "./document_templates": {
+      "types": "./dist/document_templates/index.d.ts",
+      "default": "./dist/document_templates/index.js"
+    },
+    "./document_templates/overview": {
+      "types": "./dist/document_templates/overview.d.ts",
+      "default": "./dist/document_templates/overview.js"
+    },
+    "./document_templates/editor": {
+      "types": "./dist/document_templates/editor.d.ts",
+      "default": "./dist/document_templates/editor.js"
+    },
+    "./maintenance": {
+      "types": "./dist/maintenance/index.d.ts",
+      "default": "./dist/maintenance/index.js"
+    },
+    "./workers/adjust-doc": {
+      "types": "./dist/workers/adjust_doc_to_template.d.ts",
+      "default": "./dist/workers/adjust_doc_to_template.js"
+    },
+    "./api": {
+      "types": "./dist/api/index.d.ts",
+      "default": "./dist/api/index.js"
     }
   },
   "files": [
@@ -60,12 +180,12 @@
   },
   "dependencies": {
     "fwtoolkit": "^0.1.4",
-    "prosemirror-gapcursor": "^1.3.2",
     "prosemirror-history": "^1.3.2",
     "prosemirror-keymap": "^1.2.2",
     "prosemirror-model": "^1.25.0",
     "prosemirror-state": "^1.4.3",
     "prosemirror-view": "^1.38.1",
+    "stacktrace-js": "^2.0.2",
     "w3c-keyname": "2.2.8"
   },
   "devDependencies": {

@@ -9,6 +9,11 @@ declare function interpolate(
     args: Array<string | number>,
     named?: boolean
 ): string
+declare function interpolate(
+    fmt: string,
+    args: Record<string, string | number | undefined>,
+    named: true
+): string
 
 declare function staticUrl(path: string): string
 

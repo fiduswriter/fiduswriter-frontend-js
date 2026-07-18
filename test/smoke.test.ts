@@ -10,9 +10,9 @@ const pkg = JSON.parse(readFileSync(join(pkgDir, "package.json"), "utf-8"))
 const distDir = join(pkgDir, "dist")
 const distExists = existsSync(join(distDir, "index.js"))
 
-describe("@fiduswriter/common", () => {
+describe("@fiduswriter/frontend", () => {
     test("package.json has name and version", () => {
-        expect(pkg.name).toBe("@fiduswriter/common")
+        expect(pkg.name).toBe("@fiduswriter/frontend")
         expect(pkg.version).toBeTruthy()
         expect(typeof pkg.version).toBe("string")
     })
