@@ -184,7 +184,7 @@ export class App {
                     new SiteMenu(this.config as any, "bibliography").init()
                     new FeedbackTab().init()
                     const container = dom.querySelector(
-                        "#bibliographyOverview"
+                        ".fw-contents"
                     ) as HTMLElement
                     return import(
                         "@fiduswriter/bibliography-manager/overview"
@@ -318,7 +318,7 @@ export class App {
                     new SiteMenu(this.config as any, "images").init()
                     new FeedbackTab().init()
                     const container = dom.querySelector(
-                        "#imageOverview"
+                        ".fw-contents"
                     ) as HTMLElement
                     return Promise.resolve(
                         new ImageOverview({
