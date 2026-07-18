@@ -172,7 +172,10 @@ export class App {
                     import("@fiduswriter/bibliography-manager/overview").then(
                         ({BibliographyOverview}: any) =>
                             new BibliographyOverview(
-                                this.config as any,
+                                {
+                                    app: this.config,
+                                    container: document.body
+                                } as any,
                                 this.bibliographyOverviewPlugins as any
                             )
                     )
@@ -282,7 +285,11 @@ export class App {
             usermedia: {
                 app: "usermedia",
                 requireLogin: true,
-                open: () => new ImageOverview(this.config as any)
+                open: () =>
+                    new ImageOverview({
+                        app: this.config,
+                        container: document.body
+                    } as any)
             },
             templates: {
                 app: "user_template_manager",
