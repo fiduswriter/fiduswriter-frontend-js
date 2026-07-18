@@ -209,6 +209,7 @@ export class DocMaintenance {
                         const filetypeVersion = Number.parseFloat(
                             openedFiles["filetype-version"]
                         )
+                        // @ts-ignore
                         const {bibliography, doc} = updateFile(
                             window.JSON.parse(openedFiles["document.json"]),
                             filetypeVersion,

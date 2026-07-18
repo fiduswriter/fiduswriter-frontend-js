@@ -10,7 +10,7 @@ export class DocxImporter extends GenericDocxImporter {
         importId: string,
         options: Record<string, unknown> = {}
     ) {
-        super(file, user, path, importId, {
+        super(file, user as any, path, importId, {
             getTemplate: (id: string) =>
                 postJson("/api/document/get_template/", {
                     import_id: id
@@ -20,6 +20,6 @@ export class DocxImporter extends GenericDocxImporter {
                 options.e2eeOptions as any
             ),
             e2eeOptions: options.e2eeOptions
-        })
+        } as any)
     }
 }

@@ -72,7 +72,7 @@ export class DocumentOverview {
     app: DocumentOverviewConstructorOptions["app"]
     user: Record<string, unknown>
     path: string
-    schema: ReturnType<typeof docSchema>
+    schema: any
     documentList: DocumentListEntry[]
     contacts: Contact[]
     mod: {actions?: DocumentOverviewActions}
@@ -322,7 +322,7 @@ export class DocumentOverview {
                         atob(masterKeyBase64),
                         c => c.charCodeAt(0)
                     )
-                    const masterKey = await PassphraseCrypto.importKey(
+                    const masterKey = await (PassphraseCrypto as any).importKey(
                         masterKeyBytes,
                         "AES-GCM"
                     )
@@ -939,6 +939,7 @@ export class DocumentOverview {
                                                         await import(
                                                             "fwtoolkit/e2ee/passphrase-dialog"
                                                         )
+                                                    // @ts-ignore
                                                     await showRecoveryKeyDialog(
                                                         recoveryKey
                                                     )

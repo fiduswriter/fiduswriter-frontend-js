@@ -92,11 +92,11 @@ export class DocumentOverviewActions {
     loadAccessRightsTab(doc: Record<string, unknown>): void {
         this.accessRightsLoading = true
         this.accessRightsTab = new AccessRightsTab({
-            documentIds: [doc.id],
-            contacts: this.documentOverview.contacts,
-            newContactCall: (memberDetails: Record<string, unknown>) =>
-                this.documentOverview.contacts.push(memberDetails as any),
-            e2ee: doc.e2ee,
+            documentIds: [doc.id as number],
+            contacts: this.documentOverview.contacts as any,
+            newContactCall: ((memberDetails: Record<string, unknown>) =>
+                this.documentOverview.contacts.push(memberDetails as any)) as any,
+            e2ee: doc.e2ee as boolean,
             settings: this.documentOverview.app.settings
         })
         this.accessRightsTab
@@ -348,7 +348,7 @@ export class DocumentOverviewActions {
                                     {files, e2eeOptions}
                                 )
 
-                                const {ok, statusText, doc} = await importer.init()
+                                const {ok, statusText, doc} = await (importer as any).init()
                                 deactivateWait()
                                 if (ok) {
                                     addAlert("info", statusText)
@@ -385,7 +385,7 @@ export class DocumentOverviewActions {
                                 options
                             )
 
-                            const {ok, statusText, doc} = await importer.init()
+                            const {ok, statusText, doc} = await (importer as any).init()
                             deactivateWait()
                             if (ok) {
                                 addAlert("info", statusText)
@@ -482,7 +482,7 @@ export class DocumentOverviewActions {
                                                         recoverResult.newPassphrase
                                                     )
                                                 await new Promise(resolve =>
-                                                    showRecoveryKeyDialog(newRecoveryKey, resolve)
+                                                    showRecoveryKeyDialog(newRecoveryKey, resolve as any)
                                                 )
                                                 await importWithAutoPassword()
                                                 done = true
@@ -548,9 +548,9 @@ export class DocumentOverviewActions {
                     if (!doc) return
                     const copier = new SaveCopy(
                         doc,
-                        {db: doc.bibliography},
-                        {db: doc.images},
-                        this.documentOverview.user
+                        {db: doc.bibliography as any},
+                        {db: doc.images as any},
+                        this.documentOverview.user as any
                     )
 
                     copier
@@ -640,9 +640,9 @@ export class DocumentOverviewActions {
 
                                         const copier = new SaveCopy(
                                             doc,
-                                            {db: doc.bibliography},
-                                            {db: doc.images},
-                                            this.documentOverview.user,
+                                            {db: doc.bibliography as any},
+                                            {db: doc.images as any},
+                                            this.documentOverview.user as any,
                                             (selectTemplateDialog.dialogEl.querySelector(
                                                 "select"
                                             ) as HTMLSelectElement).value,
@@ -731,7 +731,7 @@ export class DocumentOverviewActions {
                 ids.forEach(id => {
                     const doc = this.documentOverview.documentList.find(entry => entry.id === id)
                     if (!doc) return
-                    new ExportFidusFile(doc, {db: doc.bibliography}, {db: doc.images})
+                    new ExportFidusFile(doc as any, {db: doc.bibliography as any}, {db: doc.images as any})
                 })
             )
         })
@@ -748,7 +748,7 @@ export class DocumentOverviewActions {
                 ids.forEach(id => {
                     const doc = this.documentOverview.documentList.find(entry => entry.id === id)
                     if (!doc) return
-                    new ExportFidusFile(doc, {db: doc.bibliography}, {db: doc.images}, false)
+                    new ExportFidusFile(doc as any, {db: doc.bibliography as any}, {db: doc.images as any}, false)
                 })
             )
         })
@@ -769,14 +769,14 @@ export class DocumentOverviewActions {
                     import("@fiduswriter/document/exporter/html/index").then(
                         ({HTMLExporter}) => {
                             const exporter = new HTMLExporter(
-                                doc,
-                                {db: doc!.bibliography},
-                                {db: doc!.images},
-                                this.documentOverview.app.csl,
+                                doc as any,
+                                {db: doc!.bibliography as any},
+                                {db: doc!.images as any},
+                                this.documentOverview.app.csl as any,
                                 new Date((doc!.updated as number) * 1000),
                                 this.documentOverview.documentStyles
                             )
-                            exporter.progressCallback = progressCallback
+                            exporter.progressCallback = progressCallback as any
                             exporter.init()
                         }
                     )
@@ -805,13 +805,13 @@ export class DocumentOverviewActions {
                         import("@fiduswriter/document/exporter/docx/index").then(
                             ({DOCXExporter}) => {
                                 const exporter = new DOCXExporter(
-                                    doc,
+                                    doc as any,
                                     templateUrl,
-                                    {db: doc!.bibliography},
-                                    {db: doc!.images},
-                                    this.documentOverview.app.csl
+                                    {db: doc!.bibliography as any},
+                                    {db: doc!.images as any},
+                                    this.documentOverview.app.csl as any
                                 )
-                                exporter.progressCallback = progressCallback
+                                exporter.progressCallback = progressCallback as any
                                 exporter.init()
                             }
                         )
@@ -819,13 +819,13 @@ export class DocumentOverviewActions {
                         import("@fiduswriter/document/exporter/odt/index").then(
                             ({ODTExporter}) => {
                                 const exporter = new ODTExporter(
-                                    doc,
+                                    doc as any,
                                     templateUrl,
-                                    {db: doc!.bibliography},
-                                    {db: doc!.images},
-                                    this.documentOverview.app.csl
+                                    {db: doc!.bibliography as any},
+                                    {db: doc!.images as any},
+                                    this.documentOverview.app.csl as any
                                 )
-                                exporter.progressCallback = progressCallback
+                                exporter.progressCallback = progressCallback as any
                                 exporter.init()
                             }
                         )
@@ -850,12 +850,12 @@ export class DocumentOverviewActions {
                     import("@fiduswriter/document/exporter/latex/index").then(
                         ({LatexExporter}) => {
                             const exporter = new LatexExporter(
-                                doc,
-                                {db: doc!.bibliography},
-                                {db: doc!.images},
+                                doc as any,
+                                {db: doc!.bibliography as any},
+                                {db: doc!.images as any},
                                 new Date((doc!.updated as number) * 1000)
                             )
-                            exporter.progressCallback = progressCallback
+                            exporter.progressCallback = progressCallback as any
                             exporter.init()
                         }
                     )
@@ -879,14 +879,14 @@ export class DocumentOverviewActions {
                     import("@fiduswriter/document/exporter/jats/index").then(
                         ({JATSExporter}) => {
                             const exporter = new JATSExporter(
-                                doc,
-                                {db: doc!.bibliography},
-                                {db: doc!.images},
-                                this.documentOverview.app.csl,
+                                doc as any,
+                                {db: doc!.bibliography as any},
+                                {db: doc!.images as any},
+                                this.documentOverview.app.csl as any,
                                 new Date((doc!.updated as number) * 1000),
                                 "article"
                             )
-                            exporter.progressCallback = progressCallback
+                            exporter.progressCallback = progressCallback as any
                             exporter.init()
                         }
                     )
@@ -910,14 +910,14 @@ export class DocumentOverviewActions {
                     import("@fiduswriter/document/exporter/jats/index").then(
                         ({JATSExporter}) => {
                             const exporter = new JATSExporter(
-                                doc,
-                                {db: doc!.bibliography},
-                                {db: doc!.images},
-                                this.documentOverview.app.csl,
+                                doc as any,
+                                {db: doc!.bibliography as any},
+                                {db: doc!.images as any},
+                                this.documentOverview.app.csl as any,
                                 new Date((doc!.updated as number) * 1000),
                                 "book-part-wrapper"
                             )
-                            exporter.progressCallback = progressCallback
+                            exporter.progressCallback = progressCallback as any
                             exporter.init()
                         }
                     )
@@ -941,14 +941,14 @@ export class DocumentOverviewActions {
                     import("@fiduswriter/document/exporter/epub/index").then(
                         ({EpubExporter}) => {
                             const exporter = new EpubExporter(
-                                doc,
-                                {db: doc!.bibliography},
-                                {db: doc!.images},
-                                this.documentOverview.app.csl,
+                                doc as any,
+                                {db: doc!.bibliography as any},
+                                {db: doc!.images as any},
+                                this.documentOverview.app.csl as any,
                                 new Date((doc!.updated as number) * 1000),
                                 this.documentOverview.documentStyles
                             )
-                            exporter.progressCallback = progressCallback
+                            exporter.progressCallback = progressCallback as any
                             exporter.init()
                         }
                     )

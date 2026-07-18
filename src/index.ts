@@ -58,9 +58,13 @@ export {DocMaintenance} from "./maintenance/index.js"
 // Workers
 export {AdjustDocToTemplateWorker} from "./workers/adjust_doc_to_template.js"
 
+// App router
+export {App} from "./app/index.js"
+export type {AppPluginOptions} from "./app/index.js"
+
 // Types
 export type {
-    App,
+    App as AppInterface,
     BaseBodyTemplateOptions,
     Email,
     MenuPlugin,

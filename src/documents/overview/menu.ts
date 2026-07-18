@@ -85,12 +85,12 @@ export const bulkMenuModel = (): MenuModel => ({
                     )
                     const dialog = new DocumentAccessRightsDialog(
                         ids,
-                        overview.contacts,
-                        (memberDetails: Record<string, unknown>) =>
-                            overview.contacts.push(memberDetails as any),
+                        overview.contacts as any,
+                        ((memberDetails: Record<string, unknown>) =>
+                            overview.contacts.push(memberDetails as any)) as any,
                         e2ee,
                         "",
-                        null,
+                        null as any,
                         overview.app.settings
                     )
                     dialog.init()

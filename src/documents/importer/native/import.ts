@@ -175,8 +175,8 @@ export class NativeImporter extends GenericNativeImporter {
             bibliography,
             images,
             otherFiles,
-            user,
-            createNativeImporterBackend(user, e2eeOptions),
+            user as any,
+            createNativeImporterBackend(user, e2eeOptions) as any,
             {
                 importId,
                 requestedPath,

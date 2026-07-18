@@ -87,7 +87,7 @@ export const getMissingDocumentListData = (
                             )
                         ) as Node
                         doc.content = parsedNode.toJSON()
-                        doc.settings = getSettings(doc.content as Record<string, unknown>)
+                        doc.settings = getSettings(doc.content as any)
                     }
                     doc.comments = extraValues.comments
                     doc.bibliography = extraValues.bibliography

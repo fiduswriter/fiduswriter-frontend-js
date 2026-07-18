@@ -70,7 +70,7 @@ export class DocTemplatesEditor {
                     this.template.document_styles,
                     this.citationStyles,
                     this.template.export_templates,
-                    this.dom.querySelector("#template-editor")
+                    this.dom.querySelector("#template-editor")!
                 )
                 this.templateDesigner.init()
                 this.bind()

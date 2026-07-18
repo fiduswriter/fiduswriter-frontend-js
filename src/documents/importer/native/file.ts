@@ -17,7 +17,7 @@ export class FidusFileImporter extends GenericFidusFileImporter {
         contacts: Array<Record<string, unknown>> = [],
         e2eeOptions: any = null
     ) {
-        super(file, user, path, createNativeImporterBackend(user, e2eeOptions), {
+        super(file, user as any, path, createNativeImporterBackend(user, e2eeOptions) as any, {
             check,
             contacts,
             e2eeOptions,

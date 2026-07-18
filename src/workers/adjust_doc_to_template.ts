@@ -27,8 +27,8 @@ export class AdjustDocToTemplateWorker {
         const stateDoc = this.schema.nodeFromJSON(this.doc)
         const newStateDoc = this.schema.nodeFromJSON(
             adjustDocToTemplate(
-                this.doc,
-                this.template,
+                this.doc as any,
+                this.template as any,
                 this.documentStyleSlugs,
                 this.schema
             )
