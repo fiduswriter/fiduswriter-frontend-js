@@ -342,6 +342,7 @@ export class App {
                 }
             }
         }
+        this.config.routes = this.routes
         this.openLoginPage = () => new LoginPage(this.config as any)
         this.openOfflinePage = () => new OfflinePage(this.config as any)
         this.openSetupPage = () => new SetupPage(this.config as any)
