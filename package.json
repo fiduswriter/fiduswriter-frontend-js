@@ -1,6 +1,6 @@
 {
   "name": "@fiduswriter/frontend",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "Fidus Writer-specific shared utilities and UI chrome",
   "repository": {
     "type": "git",
