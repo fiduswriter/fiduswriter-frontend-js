@@ -183,7 +183,7 @@ export class App {
                         hasOverview: true,
                         app: this.config as any
                     })
-                    new SiteMenu(this.config as any, "bibliography").init()
+                    new SiteMenu(this as any, "bibliography").init()
                     new FeedbackTab(this.config as any).init()
                     const container = dom.querySelector(
                         ".fw-contents"
@@ -317,7 +317,7 @@ export class App {
                         hasOverview: true,
                         app: this.config as any
                     })
-                    new SiteMenu(this.config as any, "images").init()
+                    new SiteMenu(this as any, "images").init()
                     new FeedbackTab(this.config as any).init()
                     const container = dom.querySelector(
                         ".fw-contents"
