@@ -17,7 +17,6 @@ import {LoginPage} from "../user/auth/login.js"
 import {PasswordResetChangePassword} from "../user/auth/password_reset_change.js"
 import {PasswordResetRequest} from "../user/auth/password_reset_request.js"
 import {Signup} from "../user/auth/signup.js"
-import {DocTemplatesEditor, DocTemplatesOverview} from "../document_templates/index.js"
 import {DocumentOverview} from "../documents/overview/index.js"
 import {IndexedDB} from "../indexed_db/index.js"
 import {Page404} from "../pages/404.js"
@@ -331,24 +330,7 @@ export class App {
                     )
                 }
             },
-            templates: {
-                app: "user_template_manager",
-                requireLogin: true,
-                open: (pathnameParts: string[]) => {
-                    const id = pathnameParts[2]
-                    if (id) {
-                        const editor = new DocTemplatesEditor(this.config as any, id)
-                        return Promise.resolve(editor)
-                    }
-                    const overview = new DocTemplatesOverview(this.config as any)
-                    return Promise.resolve(overview)
-                },
-                dbTables: {
-                    list: {
-                        keyPath: "id"
-                    }
-                }
-            }
+
         }
         this.config.routes = this.routes
         this.openLoginPage = () => new LoginPage(this.config as any)
