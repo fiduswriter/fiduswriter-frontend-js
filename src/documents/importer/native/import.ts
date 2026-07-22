@@ -75,7 +75,7 @@ export function createNativeImporterBackend(
                 }
             }
             return apiConnectors.documentImport.createDoc(jsonData, files as any)
-                .then((json: any) => ({
+                .then(({json}: any) => ({
                     id: json.id,
                     path: json.path,
                     e2ee: json.e2ee,
@@ -114,7 +114,7 @@ export function createNativeImporterBackend(
                     const result: any = isE2EE
                         ? await apiConnectors.documentImport.saveE2EEImage(jsonData, files as any)
                         : await apiConnectors.documentImport.saveImage(jsonData, files as any)
-                    ImageTranslationTable[imageEntry.id] = result.id
+                    ImageTranslationTable[imageEntry.id] = result.json.id
                 })
             )
             return ImageTranslationTable
@@ -139,7 +139,7 @@ export function createNativeImporterBackend(
                 )
             }
             return apiConnectors.documentImport.saveDocument(saveData)
-                .then((json: any) => ({added: json.added, updated: json.updated}))
+                .then(({json}: any) => ({added: json.added, updated: json.updated}))
                 .catch((error: Error) => {
                     addAlert(
                         "error",
