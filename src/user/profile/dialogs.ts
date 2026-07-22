@@ -1,4 +1,5 @@
 import {Dialog, activateWait, addAlert, deactivateWait, escapeText} from "fwtoolkit"
+import type {FrontendApp} from "../../types.js"
 import {
     changeAvatarDialogTemplate,
     changeEmailDialogTemplate,
@@ -8,7 +9,7 @@ import {
     deleteEmailDialogTemplate
 } from "./templates.js"
 
-export const changeAvatarDialog = (app: any): void => {
+export const changeAvatarDialog = (app: FrontendApp): void => {
     const buttons = [
         {
             text: gettext("Upload"),
@@ -22,12 +23,12 @@ export const changeAvatarDialog = (app: any): void => {
 
                 const file: File = avatarUploader.files![0]
 
-                ;(app as any).apiConnectors.userProfile.avatarUpload({
+                app.apiConnectors.userProfile.avatarUpload({
                     avatar: {
                         file,
                         filename: file.name
                     }
-                } as Record<string, unknown>)
+                })
                     .then(() => deactivateWait())
                     .then(() => app.getConfiguration())
                     .then(() => app.selectPage())
@@ -70,10 +71,10 @@ export const changeAvatarDialog = (app: any): void => {
     }
 }
 
-const deleteAvatar = (app: any): void => {
+const deleteAvatar = (app: FrontendApp): void => {
     activateWait()
 
-    ;(app as any).apiConnectors.userProfile.avatarDelete()
+    app.apiConnectors.userProfile.avatarDelete()
         .then(() => deactivateWait())
         .then(() => app.getConfiguration())
         .then(() => app.selectPage())
@@ -83,7 +84,7 @@ const deleteAvatar = (app: any): void => {
         })
 }
 
-export const deleteAvatarDialog = (app: any): void => {
+export const deleteAvatarDialog = (app: FrontendApp): void => {
     const buttons = [
         {
             text: gettext("Delete"),
@@ -105,7 +106,7 @@ export const deleteAvatarDialog = (app: any): void => {
     dialog.open()
 }
 
-export const changePwdDialog = ({username, app}: {username: string; app?: any}): void => {
+export const changePwdDialog = ({username, app}: {username: string; app: FrontendApp}): void => {
     const buttons = [
         {
             text: gettext("Submit"),
@@ -130,7 +131,7 @@ export const changePwdDialog = ({username, app}: {username: string; app?: any}):
 
                 activateWait()
 
-                ;(app as any).apiConnectors.userProfile.passwordChange({
+                app.apiConnectors.userProfile.passwordChange({
                     old_password: oldPwd,
                     new_password1: newPwd1,
                     new_password2: newPwd2
@@ -171,7 +172,7 @@ export const changePwdDialog = ({username, app}: {username: string; app?: any}):
     dialog.open()
 }
 
-export const addEmailDialog = (app: any): void => {
+export const addEmailDialog = (app: FrontendApp): void => {
     const buttons = [
         {
             text: gettext("Submit"),
@@ -190,7 +191,7 @@ export const addEmailDialog = (app: any): void => {
 
                 ;(document.getElementById("new-profile-email") as HTMLInputElement).value = email
 
-                ;(app as any).apiConnectors.userProfile.emailAdd({email})
+                app.apiConnectors.userProfile.emailAdd({email})
                     .then(({json, status}: any) => {
                         deactivateWait()
                         if (200 === status) {
@@ -204,9 +205,9 @@ export const addEmailDialog = (app: any): void => {
                                         `${gettext("Confirmation e-mail sent to")}: ${email}`
                                     )
                                 )
-                        } else {
-                            if (errorEl) errorEl.innerHTML = json.msg["email"][0]
                         }
+                        if (errorEl) errorEl.innerHTML = json.msg["email"][0]
+                        return undefined
                     })
                     .catch(() => {
                         deactivateWait()
@@ -227,7 +228,7 @@ export const addEmailDialog = (app: any): void => {
     dialog.open()
 }
 
-export const deleteEmailDialog = (target: HTMLElement, app: any): void => {
+export const deleteEmailDialog = (target: HTMLElement, app: FrontendApp): void => {
     const email = target.dataset.email
 
     const buttons = [
@@ -237,7 +238,7 @@ export const deleteEmailDialog = (target: HTMLElement, app: any): void => {
             click: () => {
                 activateWait()
 
-                ;(app as any).apiConnectors.userProfile.emailDelete({email})
+                app.apiConnectors.userProfile.emailDelete({email})
                     .then(() => {
                         dialog.close()
                         deactivateWait()
@@ -268,7 +269,7 @@ export const deleteEmailDialog = (target: HTMLElement, app: any): void => {
     dialog.open()
 }
 
-export const deleteSocialaccountDialog = (target: HTMLElement, app: any): void => {
+export const deleteSocialaccountDialog = (target: HTMLElement, app: FrontendApp): void => {
     const socialaccount = Number.parseInt(target.dataset.socialaccount!)
     const provider = target.dataset.provider
 
@@ -279,7 +280,7 @@ export const deleteSocialaccountDialog = (target: HTMLElement, app: any): void =
             click: () => {
                 activateWait()
 
-                ;(app as any).apiConnectors.userProfile.deleteSocialAccount({socialaccount})
+                app.apiConnectors.userProfile.deleteSocialAccount({socialaccount})
                     .then(() => {
                         dialog.close()
                         deactivateWait()
@@ -313,7 +314,7 @@ export const deleteSocialaccountDialog = (target: HTMLElement, app: any): void =
     dialog.open()
 }
 
-export const changePrimaryEmailDialog = (app: any): void => {
+export const changePrimaryEmailDialog = (app: FrontendApp): void => {
     const primEmailRadio = document.querySelector(
         ".primary-email-radio:checked"
     ) as HTMLInputElement
@@ -325,7 +326,7 @@ export const changePrimaryEmailDialog = (app: any): void => {
             click: () => {
                 activateWait()
 
-                ;(app as any).apiConnectors.userProfile.emailPrimary({email})
+                app.apiConnectors.userProfile.emailPrimary({email})
                     .then(() => {
                         dialog.close()
                         deactivateWait()

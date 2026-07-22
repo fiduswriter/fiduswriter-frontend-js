@@ -4,7 +4,7 @@ import {getSettings} from "@fiduswriter/document/schema/convert"
 import {acceptAllNoInsertions} from "@fiduswriter/document/transform"
 import {addAlert} from "fwtoolkit"
 
-import type {DocumentListApi} from "../api/index.js"
+import type {DocumentApi} from "../api/index.js"
 
 export interface DocEntry {
     id: number
@@ -23,7 +23,7 @@ export const getMissingDocumentListData = (
     ids: Array<number | string>,
     documentList: DocEntry[],
     schema: Schema,
-    documentListApi: DocumentListApi,
+    documentListApi: DocumentApi,
     rawContent = false
 ): Promise<void> => {
     // get extra data for the documents identified by the ids and updates the

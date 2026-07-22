@@ -5,13 +5,15 @@ import {updateDoc} from "@fiduswriter/document/schema/convert"
 import {FW_DOCUMENT_VERSION} from "@fiduswriter/document/schema/index"
 import {addAlert, findTarget, whenReady} from "fwtoolkit"
 
+import type {FrontendApp} from "../types.js"
+
 export class DocMaintenance {
-    app: any
+    app: FrontendApp
     batch: number
     revSavesLeft: number
     docTemplatesSavesLeft: number
 
-    constructor(app: any) {
+    constructor(app: FrontendApp) {
         this.app = app
         this.batch = 0
         this.revSavesLeft = 0

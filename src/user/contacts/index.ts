@@ -21,9 +21,18 @@ import {
     displayContactType,
     respondInviteCell
 } from "./templates.js"
+import type {FrontendApp} from "../../types.js"
+
+export interface ContactsApp extends FrontendApp {
+    indexedDB: {
+        readAllData: (store: string) => Promise<Array<Record<string, unknown>>>
+        clearData: (store: string) => Promise<void>
+        insertData: (store: string, data: Array<Record<string, unknown>>) => Promise<void>
+    }
+}
 
 export class ContactsOverview {
-    app: any
+    app: ContactsApp
     user: Record<string, unknown>
     contacts: Array<Record<string, unknown>>
     lastSort: {column: number; dir: string}
@@ -33,7 +42,7 @@ export class ContactsOverview {
     dtBulk: any
     menu: any
 
-    constructor({app, user}: {app: any; user: Record<string, unknown>}) {
+    constructor({app, user}: {app: ContactsApp; user: Record<string, unknown>}) {
         this.app = app
         this.user = user
         this.contacts = []
@@ -168,7 +177,7 @@ export class ContactsOverview {
         if (this.app.isOffline()) {
             return cachedPromise.then(() => {})
         }
-        return (this.app as any).apiConnectors.contacts.list()
+        return this.app.apiConnectors.contacts.list()
             .then((json: any) => {
                 return cachedPromise.then(oldJson => {
                     if (!deepEqual(json, oldJson)) {

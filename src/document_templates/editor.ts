@@ -11,10 +11,11 @@ import {
     whenReady
 } from "fwtoolkit"
 
-interface AppLike {
+import type {FrontendApp} from "../types.js"
+
+interface AppLike extends FrontendApp {
     csl: {getStyles: () => Promise<any>}
     page: unknown
-    [key: string]: unknown
 }
 
 export class DocTemplatesEditor {
@@ -46,7 +47,7 @@ export class DocTemplatesEditor {
             .getStyles()
             .then(styles => {
                 this.citationStyles = styles
-                return (this.app as any).apiConnectors.documentTemplate.get({
+                return this.app.apiConnectors.documentTemplate.get({
                     id: this.id
                 })
             })
@@ -68,7 +69,8 @@ export class DocTemplatesEditor {
                     this.template.document_styles,
                     this.citationStyles,
                     this.template.export_templates,
-                    this.dom.querySelector("#template-editor")!
+                    this.dom.querySelector("#template-editor")!,
+                    this.app.apiConnectors.documentTemplate
                 )
                 this.templateDesigner.init()
                 this.bind()
@@ -109,7 +111,7 @@ export class DocTemplatesEditor {
             </div>
         </div>`
         document.body = this.dom
-        setDocTitle(gettext("Template Editor"), this.app as any)
+        setDocTitle(gettext("Template Editor"), this.app)
         const feedbackTab = new FeedbackTab(this.app)
         feedbackTab.init()
     }
@@ -132,7 +134,7 @@ export class DocTemplatesEditor {
             this.showErrors(errors)
             return Promise.reject()
         } else {
-            return (this.app as any).apiConnectors.documentTemplate.save({
+            return this.app.apiConnectors.documentTemplate.save({
                 id: this.id,
                 value,
                 import_id,
@@ -145,7 +147,7 @@ export class DocTemplatesEditor {
         this.save().then(() => {
             const exporter = new DocumentTemplateExporter(
                 this.id,
-                "/api/user_template_manager/get/"
+                this.app.apiConnectors.documentTemplate
             )
             exporter.init()
         })
@@ -165,7 +167,7 @@ export class DocTemplatesEditor {
                     break
                 case findTarget(event, "button.close, span.close", el):
                     event.preventDefault()
-                    ;(this.app as any).goTo("/templates/")
+                    this.app.goTo("/templates/")
                     break
                 default:
                     break

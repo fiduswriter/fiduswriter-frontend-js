@@ -23,13 +23,15 @@ import {Page404} from "../pages/404.js"
 import {FlatPage} from "../pages/flatpage.js"
 import {OfflinePage} from "../pages/offline.js"
 import {SetupPage} from "../pages/setup.js"
-import {ContactsOverview} from "../user/contacts/index.js"
+import {ContactsOverview, type ContactsApp} from "../user/contacts/index.js"
 import {Profile} from "../user/profile/index.js"
 import {baseBodyTemplate} from "../common/index.js"
 import {SiteMenu} from "../menu/index.js"
 import {FeedbackTab} from "../feedback/index.js"
 
 import type {ApiConnectors} from "../api/index.js"
+import type {PreloginApp} from "../prelogin/index.js"
+import type {FrontendApp, Settings} from "../types.js"
 
 // ---- Plugin types ----
 
@@ -77,9 +79,10 @@ interface Page {
 // ---- App class ----
 
 export class App {
+    app: PreloginApp
     apiConnectors: ApiConnectors
-    settings: Record<string, any>
-    config: Record<string, any>
+    settings: Settings
+    config: FrontendApp
     name: string
     menuPlugins: PluginList
     appPlugins: PluginList
@@ -94,30 +97,49 @@ export class App {
     open404Page: () => Page
     handleSWUpdate: () => void
 
-    page?: Page
-    ws?: any
-    csl?: any
+    private _page?: Page
+    ws?: FrontendApp["ws"]
+    csl?: FrontendApp["csl"]
     bibDB?: any
     imageDB?: any
     indexedDB?: IndexedDB
     plugins?: Record<string, any>
     inviteKey?: string
 
+    get page(): Page | undefined {
+        return this._page
+    }
+
+    set page(page: Page | undefined) {
+        this._page = page
+        this.config.page = page
+    }
+
     constructor(
         apiConnectors: ApiConnectors,
-        settings: Record<string, any> = {},
+        settings: Settings = {
+            APPS: [],
+            apiUrl: (url: string) => url,
+            getCsrfToken: () => ""
+        },
         pluginOpts: AppPluginOptions = {}
     ) {
         this.apiConnectors = apiConnectors
 
-        settings.gettext = (window as any).gettext
-        settings.staticUrl = (window as any).staticUrl
-        settings.interpolate = (window as any).interpolate
-        initSettings(settings as any)
-        this.settings = getSettings() as Record<string, any>
-        this.config = {}
+        ;(settings as Record<string, unknown>).gettext = (window as any).gettext
+        ;(settings as Record<string, unknown>).staticUrl = (window as any).staticUrl
+        ;(settings as Record<string, unknown>).interpolate = (window as any).interpolate
+        initSettings(settings)
+        this.settings = getSettings() as Settings
+        this.config = {} as FrontendApp
+        this.config.settings = this.settings
         this.name = "Fidus Writer"
-        this.config.app = this
+        this.app = this as unknown as PreloginApp
+        this.config.app = this.app
+        this.config.name = this.name
+        this.config.isOffline = this.isOffline.bind(this)
+        this.config.getConfiguration = this.getConfiguration.bind(this)
+        this.config.selectPage = this.selectPage.bind(this)
 
         this.appPlugins = pluginOpts.appPlugins ?? []
         this.menuPlugins = pluginOpts.menuPlugins ?? []
@@ -135,7 +157,10 @@ export class App {
                 app: "document",
                 requireLogin: true,
                 open: () => {
-                    const overview = new DocumentOverview(this.config as any, "/")
+                    const overview = new DocumentOverview(
+                        {app: this.config, user: this.config.user},
+                        "/"
+                    )
                     return Promise.resolve(overview)
                 }
             },
@@ -147,22 +172,31 @@ export class App {
                     switch (pathnameParts[2]) {
                         case "confirm-email": {
                             const key = pathnameParts[3]
-                            returnValue = new EmailConfirm(this.config as any, key)
+                            returnValue = new EmailConfirm(
+                                {app: this.config.app as PreloginApp, language: ""},
+                                key
+                            )
                             break
                         }
                         case "password-reset":
-                            returnValue = new PasswordResetRequest(this.config as any)
+                            returnValue = new PasswordResetRequest({
+                                app: this.config.app as PreloginApp,
+                                language: ""
+                            })
                             break
                         case "change-password": {
                             const key = pathnameParts[3]
                             returnValue = new PasswordResetChangePassword(
-                                this.config as any,
+                                {app: this.config.app as PreloginApp, language: ""},
                                 key
                             )
                             break
                         }
                         case "sign-up":
-                            returnValue = new Signup(this.config as any)
+                            returnValue = new Signup({
+                                app: this.config.app as PreloginApp,
+                                language: ""
+                            })
                             break
                         default:
                             returnValue = false
@@ -179,12 +213,12 @@ export class App {
                     dom.classList.add("fw-scrollable")
                     dom.innerHTML = baseBodyTemplate({
                         contents: "",
-                        user: this.config.user as any,
+                        user: this.config.user,
                         hasOverview: true,
-                        app: this.config as any
+                        app: this.config
                     })
-                    new SiteMenu(this as any, "bibliography").init()
-                    new FeedbackTab(this.config as any).init()
+                    new SiteMenu(this.app, "bibliography").init()
+                    new FeedbackTab(this.config).init()
                     const container = dom.querySelector(
                         ".fw-contents"
                     ) as HTMLElement
@@ -196,8 +230,8 @@ export class App {
                                 {
                                     app: this.config.app,
                                     container
-                                } as any,
-                                this.bibliographyOverviewPlugins as any
+                                },
+                                this.bibliographyOverviewPlugins
                             )
                     )
                 }
@@ -218,11 +252,11 @@ export class App {
                     ).then(
                         ({Editor}: any) =>
                             new Editor(
-                                this.config as any,
+                                this.config,
                                 path,
                                 id,
-                                this.editorPlugins as any,
-                                this.citationDialogPlugins as any
+                                this.editorPlugins,
+                                this.citationDialogPlugins
                             )
                     )
                 },
@@ -247,11 +281,11 @@ export class App {
                     ).then(
                         ({Editor}: any) =>
                             new Editor(
-                                this.config as any,
+                                this.config,
                                 path,
                                 token,
-                                this.editorPlugins as any,
-                                this.citationDialogPlugins as any
+                                this.editorPlugins,
+                                this.citationDialogPlugins
                             )
                     )
                 }
@@ -263,7 +297,10 @@ export class App {
                     const path = (
                         "/" + pathnameParts.slice(2).join("/")
                     ).replace(/\/?$/, "/")
-                    const overview = new DocumentOverview(this.config as any, path)
+                    const overview = new DocumentOverview(
+                        {app: this.config, user: this.config.user},
+                        path
+                    )
                     return Promise.resolve(overview)
                 }
             },
@@ -271,7 +308,10 @@ export class App {
                 app: "base",
                 open: (pathnameParts: string[]) => {
                     const url = `/${pathnameParts[2]}/`
-                    return new FlatPage(this.config as any, url)
+                    return new FlatPage(
+                        {app: this.config.app as PreloginApp, language: ""},
+                        url
+                    )
                 }
             },
             user: {
@@ -281,10 +321,18 @@ export class App {
                     let returnValue: any
                     switch (pathnameParts[2]) {
                         case "profile":
-                            returnValue = new Profile(this.config as any)
+                            returnValue = new Profile({
+                                app: this.config,
+                                user: this.config.user,
+                                socialaccount_providers:
+                                    this.config.socialaccount_providers ?? []
+                            })
                             break
                         case "contacts":
-                            returnValue = new ContactsOverview(this.config as any)
+                            returnValue = new ContactsOverview({
+                                app: this.config as ContactsApp,
+                                user: this.config.user
+                            })
                             break
                         default:
                             returnValue = false
@@ -301,7 +349,7 @@ export class App {
                 app: "user",
                 open: (pathnameParts: string[]) => {
                     const id = pathnameParts[2]
-                    return new ContactInvite(this.config as any, id)
+                    return new ContactInvite({app: this.config.app as PreloginApp}, id)
                 }
             },
             usermedia: {
@@ -313,18 +361,18 @@ export class App {
                     dom.classList.add("fw-scrollable")
                     dom.innerHTML = baseBodyTemplate({
                         contents: "",
-                        user: this.config.user as any,
+                        user: this.config.user,
                         hasOverview: true,
-                        app: this.config as any
+                        app: this.config
                     })
-                    new SiteMenu(this as any, "images").init()
-                    new FeedbackTab(this.config as any).init()
+                    new SiteMenu(this.app, "images").init()
+                    new FeedbackTab(this.config).init()
                     const container = dom.querySelector(
                         ".fw-contents"
                     ) as HTMLElement
                     return Promise.resolve(
                         new ImageOverview({
-                            app: this.config.app,
+                            app: this.app,
                             container
                         } as any)
                     )
@@ -333,17 +381,26 @@ export class App {
 
         }
         this.config.routes = this.routes
-        this.openLoginPage = () => new LoginPage(this.config as any)
-        this.openOfflinePage = () => new OfflinePage(this.config as any)
-        this.openSetupPage = () => new SetupPage(this.config as any)
-        this.open404Page = () => new Page404(this.config as any)
+        this.openLoginPage = () =>
+            new LoginPage({
+                app: this.config.app as PreloginApp,
+                language: "",
+                socialaccount_providers: this.config.socialaccount_providers ?? []
+            })
+        this.openOfflinePage = () =>
+            new OfflinePage({app: this.config.app as PreloginApp, language: ""})
+        this.openSetupPage = () =>
+            new SetupPage({app: this.config.app as PreloginApp, language: ""})
+        this.open404Page = () =>
+            new Page404({app: this.config.app as PreloginApp, language: ""})
         this.handleSWUpdate = () => window.location.reload()
     }
 
     isOffline(): boolean {
+        const ws = this.ws
         return (
             !navigator.onLine ||
-            (this.ws?.connectionCount > 0 && !this.ws?.connected)
+            (ws !== undefined && !!ws.connectionCount && !ws.connected)
         )
     }
 
@@ -431,12 +488,15 @@ export class App {
 
     setup(): Promise<any> {
         this.csl = new CSL()
+        this.config.csl = this.csl
         if (!this.config.user.is_authenticated) {
             this.activateFidusPlugins()
             return this.selectPage().then(() => this.bind())
         }
         this.bibDB = new BibliographyDB(this as any)
+        this.config.bibDB = this.bibDB
         this.imageDB = new ImageDB(this as any)
+        this.config.imageDB = this.imageDB
         this.connectWs()
         return Promise.all([this.bibDB.getDB(), this.imageDB.getDB()])
             .then(() => {
@@ -444,11 +504,14 @@ export class App {
                 // Initialize the indexedDB after the plugins have loaded.
                 this.indexedDB = new IndexedDB(
                     this.config.user.username,
-                    this.routes as any
+                    this.routes
                 )
                 return this.indexedDB.init()
             })
-            .then(() => this.selectPage())
+            .then(() => {
+                this.config.indexedDB = this.indexedDB
+                return this.selectPage()
+            })
             .then(() => this.bind())
             .then(() => this.showNews())
     }
@@ -523,7 +586,7 @@ export class App {
             return
         }
         this.ws = new (WebSocketConnector as any)({
-            base: this.config.ws_url_base,
+            base: this.config.ws_url_base!,
             path: "/base/",
             appLoaded: () => true,
             receiveData: (data: any) => {
@@ -536,7 +599,8 @@ export class App {
                 }
             }
         })
-        this.ws.init()
+        this.config.ws = this.ws
+        this.ws?.init()
     }
 
     activateFidusPlugins(): void {

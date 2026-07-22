@@ -1,5 +1,5 @@
 import {escapeText} from "fwtoolkit"
-import {PreloginPage} from "../../prelogin/index.js"
+import {PreloginPage, type PreloginApp} from "../../prelogin/index.js"
 
 export class LoginPage extends PreloginPage {
     socialaccount_providers: Array<Record<string, unknown>>
@@ -9,7 +9,7 @@ export class LoginPage extends PreloginPage {
         language,
         socialaccount_providers
     }: {
-        app: any
+        app: PreloginApp
         language: string
         socialaccount_providers: Array<Record<string, unknown>>
     }) {
@@ -138,7 +138,7 @@ export class LoginPage extends PreloginPage {
             if (errors) {
                 return
             }
-            return (this.app as any).apiConnectors.auth.login({login, password, remember})
+            return this.app.apiConnectors.auth.login({login, password, remember})
                 .catch((response: any) => {
                     if (!(response instanceof Response) || response.status !== 400) {
                         return Promise.reject(response)
@@ -213,10 +213,10 @@ export class LoginPage extends PreloginPage {
             ) {
                 window.location.reload()
             } else {
-                ;(this.app as any).init()
+                this.app.init()
             }
         } else {
-            ;(this.app as any).init()
+            this.app.init()
         }
     }
 }

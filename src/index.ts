@@ -80,7 +80,7 @@ export type {
 export type {PreloginApp} from "./prelogin/index.js"
 export type {
     ConfigApi,
-    DocumentListApi,
+    DocumentApi,
     DocumentImportApi,
     UserProfileApi,
     AuthApi,
@@ -91,5 +91,7 @@ export type {
     ErrorHookApi,
     MaintenanceApi,
     RevisionApi,
+    BibliographyApi,
+    ImageApi,
     ApiConnectors
 } from "./api/index.js"

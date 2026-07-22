@@ -1,12 +1,13 @@
 import {Dialog, activateWait, addAlert, deactivateWait} from "fwtoolkit"
+import type {FrontendApp} from "../../types.js"
 import {deleteUserDialogTemplate} from "./templates.js"
 
 export class DeleteUserDialog {
     username: string
-    app: any
+    app: FrontendApp
     dialog: any
 
-    constructor(username: string, app: any) {
+    constructor(username: string, app: FrontendApp) {
         this.username = username
         this.app = app
     }

@@ -1,10 +1,11 @@
 import {Dialog} from "fwtoolkit"
+import type {FrontendApp} from "../../types.js"
 
 export class DeleteContactDialog {
     contacts: Array<Record<string, unknown>>
-    app: any
+    app: FrontendApp
 
-    constructor(contacts: Array<Record<string, unknown>>, app?: any) {
+    constructor(contacts: Array<Record<string, unknown>>, app: FrontendApp) {
         this.contacts = contacts
         this.app = app
     }

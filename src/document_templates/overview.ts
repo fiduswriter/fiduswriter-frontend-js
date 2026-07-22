@@ -12,25 +12,23 @@ import {
     whenReady
 } from "fwtoolkit"
 
+import type {FrontendApp, User} from "../types.js"
 import {DocTemplatesActions} from "./actions.js"
 import {bulkMenuModel, menuModel} from "./menu.js"
 
-interface AppLike {
-    isOffline: () => boolean
-    goTo: (url: string) => void
+interface AppLike extends FrontendApp {
+    csl: {getStyles: () => Promise<any>}
     indexedDB: {
         readAllData: (store: string) => Promise<Array<Record<string, unknown>>>
         clearData: (store: string) => Promise<void>
         insertData: (store: string, data: Array<Record<string, unknown>>) => Promise<void>
     }
-    settings: Record<string, unknown>
     page: unknown
-    [key: string]: unknown
 }
 
 export class DocTemplatesOverview {
     app: AppLike
-    user: Record<string, unknown>
+    user: User
     mod: {actions?: DocTemplatesActions}
     templateList: Array<Record<string, unknown>>
     styles: any
@@ -41,7 +39,7 @@ export class DocTemplatesOverview {
     dtBulk: any
     menu: any
 
-    constructor({app, user}: {app: AppLike; user: Record<string, unknown>}) {
+    constructor({app, user}: {app: AppLike; user: User}) {
         this.app = app
         this.user = user
         this.mod = {}
@@ -54,7 +52,7 @@ export class DocTemplatesOverview {
     init(): Promise<void> {
         return whenReady().then(() => {
             this.render()
-            const smenu = new SiteMenu(this.app as any, "templates")
+            const smenu = new SiteMenu(this.app, "templates")
             smenu.init()
             new DocTemplatesActions(this)
             this.menu = new OverviewMenuView(this, menuModel as any)
@@ -68,16 +66,16 @@ export class DocTemplatesOverview {
         this.dom = document.createElement("body")
         this.dom.innerHTML = baseBodyTemplate({
             contents: "",
-            user: this.user as any,
+            user: this.user,
             hasOverview: true,
-            app: this.app as any
+            app: this.app
         })
         document.body = this.dom
         ensureCSS([
             staticUrl("css/add_remove_dialog.css"),
             staticUrl("css/access_rights_dialog.css")
         ])
-        setDocTitle(gettext("Document Templates Overview"), this.app as any)
+        setDocTitle(gettext("Document Templates Overview"), this.app)
         const feedbackTab = new FeedbackTab(this.app)
         feedbackTab.init()
     }
@@ -246,7 +244,7 @@ export class DocTemplatesOverview {
         if (this.app.isOffline()) {
             return this.showCached()
         }
-        return (this.app as any).apiConnectors.documentTemplate.list()
+        return this.app.apiConnectors.documentTemplate.list()
             .then((json: any) => {
                 this.updateIndexedDB(json)
                 this.initializeView(json)

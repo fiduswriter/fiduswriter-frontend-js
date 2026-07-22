@@ -2,19 +2,19 @@ import {keyName} from "w3c-keyname"
 
 import {dropdownSelect, whenReady} from "fwtoolkit"
 import {headerNavTemplate} from "./templates.js"
-import type {App, MenuPlugins, NavItem, SiteMenuLike} from "../types.js"
+import type {FrontendApp, MenuPlugins, NavItem, SiteMenuLike} from "../types.js"
 
 // Bindings for the top menu on overview pages
 
 export class SiteMenu implements SiteMenuLike {
-    app: App
+    app: FrontendApp
     activeItem: string | undefined
     navItems: NavItem[]
     listeners: {onKeydown?: (event: KeyboardEvent) => void}
     keyboardShortcuts: Map<string, NavItem>
     plugins?: Record<string, {init(): void}>
 
-    constructor(app: App, activeItem?: string) {
+    constructor(app: FrontendApp, activeItem?: string) {
         this.app = app
         this.activeItem = activeItem
         this.navItems = [
@@ -209,7 +209,7 @@ export class SiteMenu implements SiteMenuLike {
                                 sessionStorage.removeItem(key)
                             }
                         }
-                        ;(this.app.apiConnectors as any).auth
+                        this.app.apiConnectors.auth
                             .logout()
                             .then(() => {
                             window.location.href =

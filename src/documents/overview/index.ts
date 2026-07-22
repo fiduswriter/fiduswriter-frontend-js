@@ -19,7 +19,7 @@ import {
 import {baseBodyTemplate} from "../../common/index.js"
 import {FeedbackTab} from "../../feedback/index.js"
 import {SiteMenu} from "../../menu/index.js"
-import type {App} from "../../types.js"
+import type {FrontendApp, User} from "../../types.js"
 
 import {DocumentOverviewActions} from "./actions.js"
 import {bulkMenuModel, menuModel} from "./menu.js"
@@ -52,24 +52,13 @@ interface Contact {
 }
 
 interface DocumentOverviewConstructorOptions {
-    app: App & {
-        isOffline: () => boolean
-        indexedDB: {
-            readAllData: (store: string) => Promise<Array<Record<string, unknown>>>
-            clearData: (store: string) => Promise<void>
-            insertData: (store: string, data: Array<Record<string, unknown>>) => Promise<void>
-        }
-        settings: Record<string, unknown>
-        bibDB?: unknown
-        csl?: {getStyles: () => Promise<unknown>}
-        page: unknown
-    }
-    user: Record<string, unknown>
+    app: FrontendApp
+    user: User & {id?: number}
 }
 
 export class DocumentOverview {
-    app: DocumentOverviewConstructorOptions["app"]
-    user: Record<string, unknown>
+    app: FrontendApp
+    user: User & {id?: number}
     path: string
     schema: any
     documentList: DocumentListEntry[]
@@ -112,7 +101,7 @@ export class DocumentOverview {
         this.active = true
         return whenReady().then(() => {
             this.render()
-            const smenu = new SiteMenu(this.app as any, "documents")
+            const smenu = new SiteMenu(this.app, "documents")
             smenu.init()
             new DocumentOverviewActions(this)
             this.menu = new OverviewMenuView(this, menuModel as any)
@@ -131,9 +120,9 @@ export class DocumentOverview {
         this.dom = document.createElement("body")
         this.dom.innerHTML = baseBodyTemplate({
             contents: "",
-            user: this.user as any,
+            user: this.user,
             hasOverview: true,
-            app: this.app as any
+            app: this.app
         })
         ensureCSS([
             staticUrl("css/document_overview.css"),
@@ -142,7 +131,7 @@ export class DocumentOverview {
             staticUrl("css/e2ee.css")
         ])
         document.body = this.dom
-        setDocTitle(gettext("Document Overview"), this.app as any)
+        setDocTitle(gettext("Document Overview"), this.app as {name: string})
         const feedbackTab = new FeedbackTab(this.app)
         feedbackTab.init()
     }
@@ -260,7 +249,7 @@ export class DocumentOverview {
             return cachedPromise.then(() => {})
         }
         return whenReady()
-            .then(() => (this.app as any).apiConnectors.documentList.getDocumentList())
+            .then(() => this.app.apiConnectors.document.getDocumentList())
             .then((json) => {
                 const typedJson = json as Record<string, unknown>
                 return cachedPromise.then(oldJson => {
@@ -282,7 +271,7 @@ export class DocumentOverview {
 
     async bulkDecryptDocumentEncryptionKeys(): Promise<void> {
         try {
-            const response = await (this.app as any).apiConnectors.documentList.getEncryptionKeys()
+            const response = await this.app.apiConnectors.document.getEncryptionKeys()
 
             if (!(response as any)?.keys?.length) {
                 return
@@ -369,13 +358,13 @@ export class DocumentOverview {
     }
 
     loaddatafromIndexedDB(): Promise<any> {
-        return this.app.indexedDB
+        return this.app.indexedDB!
             .readAllData("document_data")
             .then(response => {
                 if (!response.length) {
                     return false
                 }
-                const data = response[0]
+                const data = response[0] as Record<string, unknown>
                 delete data.id
                 return data
             })
@@ -383,9 +372,9 @@ export class DocumentOverview {
 
     updateIndexedDB(json: Record<string, unknown>): Promise<void> {
         ;(json as any).id = 1
-        return this.app.indexedDB
+        return this.app.indexedDB!
             .clearData("document_data")
-            .then(() => this.app.indexedDB.insertData("document_data", [json]))
+            .then(() => this.app.indexedDB!.insertData("document_data", [json]))
     }
 
     initializeView(json: any): any {
@@ -495,7 +484,7 @@ export class DocumentOverview {
             pathParts.pop()
             const parentPath = pathParts.join("/") + "/"
             const href =
-                parentPath === "/" && (this.app as any).routes[""].app === "document"
+                parentPath === "/" && this.app.routes[""].app === "document"
                     ? parentPath
                     : `/documents${encodeURI(parentPath)}`
             tableRender = (_data: any, table: any, type: string) => {

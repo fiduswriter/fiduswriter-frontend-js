@@ -3,15 +3,25 @@
 // The default Django implementation will call postJson/getJson with hardcoded URLs.
 // The interfaces exist so consuming apps can swap in alternative implementations.
 
+import type {
+    EditorDocumentApi,
+    EditorDocumentImportApi
+} from "@fiduswriter/editor"
+import type {BibliographyApi} from "@fiduswriter/bibliography-manager"
+import type {ImageApi} from "@fiduswriter/image-manager"
+import type {DocumentTemplateApi} from "@fiduswriter/document-template-editor"
+
+export type {BibliographyApi, ImageApi, DocumentTemplateApi}
+
 // ---- ConfigApi ----
 
 export interface ConfigApi {
     getConfiguration(): Promise<Record<string, unknown>>
 }
 
-// ---- DocumentListApi ----
+// ---- DocumentApi ----
 
-export interface DocumentListApi {
+export interface DocumentApi extends EditorDocumentApi {
     getDocumentList(): Promise<Record<string, unknown>>
     getDocumentListExtra(ids: number[]): Promise<Record<string, unknown>>
     deleteDocument(data: {id?: number; ids?: number[]}): Promise<Record<string, unknown>>
@@ -21,17 +31,7 @@ export interface DocumentListApi {
 
 // ---- DocumentImportApi ----
 
-export interface DocumentImportApi {
-    createDoc(data: Record<string, unknown>, files?: Record<string, unknown>): Promise<Record<string, unknown>>
-    saveImage(
-        data: Record<string, unknown>,
-        files: Record<string, unknown>
-    ): Promise<Record<string, unknown>>
-    saveE2EEImage(
-        data: Record<string, unknown>,
-        files: Record<string, unknown>
-    ): Promise<Record<string, unknown>>
-    saveDocument(data: Record<string, unknown>): Promise<Record<string, unknown>>
+export interface DocumentImportApi extends EditorDocumentImportApi {
     getTemplate(importId: string): Promise<Record<string, unknown>>
 }
 
@@ -78,17 +78,6 @@ export interface ContactsApi {
     accept(data: Record<string, unknown>): Promise<{json: Record<string, unknown>; status: number}>
     decline(data: Record<string, unknown>): Promise<{status: number}>
     invite(data: {key: string}): Promise<{json: Record<string, unknown>}>
-}
-
-// ---- DocumentTemplateApi ----
-
-export interface DocumentTemplateApi {
-    list(): Promise<Record<string, unknown>>
-    get(data: {id: number}): Promise<{json: Record<string, unknown>}>
-    save(data: Record<string, unknown>): Promise<unknown>
-    delete(data: {id: number}): Promise<{json: Record<string, unknown>}>
-    create(data: Record<string, unknown>, files?: Record<string, unknown>): Promise<unknown>
-    copy(data: {id: number; title: string}): Promise<{json: Record<string, unknown>}>
 }
 
 // ---- FlatPageApi ----
@@ -141,7 +130,7 @@ export interface RevisionApi {
 // ---- Bundled connectors ----
 
 export interface ApiConnectors {
-    documentList: DocumentListApi
+    document: DocumentApi
     documentImport: DocumentImportApi
     userProfile: UserProfileApi
     auth: AuthApi
@@ -154,4 +143,6 @@ export interface ApiConnectors {
     config: ConfigApi
     maintenance: MaintenanceApi
     revision: RevisionApi
+    bibliography: BibliographyApi
+    image: ImageApi
 }

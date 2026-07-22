@@ -3,11 +3,14 @@ import {addContactTemplate} from "./templates.js"
 
 export class AddContactDialog {
     settings: Record<string, unknown>
-    app: any
+    contactsApi: {add(data: {user_string: string}): Promise<{json: unknown; status: number}>}
 
-    constructor(settings: Record<string, unknown>, app: any) {
+    constructor(
+        settings: Record<string, unknown>,
+        contactsApi: {add(data: {user_string: string}): Promise<{json: unknown; status: number}>}
+    ) {
         this.settings = settings
-        this.app = app
+        this.contactsApi = contactsApi
     }
 
     init(): Promise<Array<Record<string, unknown>>> {
@@ -78,7 +81,7 @@ export class AddContactDialog {
             return cancelPromise()
         }
 
-        return this.app.apiConnectors.contacts.add({
+        return this.contactsApi.add({
             user_string: userString
         }).then(({json, status}: any) => {
             if (status == 201) {

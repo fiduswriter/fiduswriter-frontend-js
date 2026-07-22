@@ -5,8 +5,10 @@ import {
     deactivateWait
 } from "fwtoolkit"
 import QRCode from "qrcode"
+import type {FrontendApp} from "../../types.js"
+import type {LoginPage} from "./login.js"
 
-export const twoFactorSetupDialog = (app: any): Promise<any> => {
+export const twoFactorSetupDialog = (app: FrontendApp): Promise<any> => {
     let secretKey: string | null = null
     let deviceId: string | null = null
 
@@ -119,7 +121,7 @@ export const twoFactorSetupDialog = (app: any): Promise<any> => {
     })
 }
 
-export const twoFactorDisableDialog = (app: any): any => {
+export const twoFactorDisableDialog = (app: FrontendApp): any => {
     const buttons = [
         {
             text: gettext("Disable 2FA"),
@@ -172,8 +174,8 @@ export const twoFactorLoginDialog = ({
     login: string
     password: string
     remember: boolean
-    loginPage: any
-    app: any
+    loginPage: LoginPage
+    app: FrontendApp
 }): any => {
     const buttons = [
         {
@@ -233,7 +235,7 @@ export const twoFactorLoginDialog = ({
     return dialog
 }
 
-export const checkTwoFactorStatus = (app: any): Promise<boolean> => {
+export const checkTwoFactorStatus = (app: FrontendApp): Promise<boolean> => {
     return app.apiConnectors.auth.twoFactorStatus()
         .then((json: any) => {
             if (json.status === "success") {

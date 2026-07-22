@@ -1,8 +1,8 @@
 import {escapeText} from "fwtoolkit"
-import {PreloginPage} from "../../prelogin/index.js"
+import {PreloginPage, type PreloginApp} from "../../prelogin/index.js"
 
 export class Signup extends PreloginPage {
-    constructor({app, language}: {app: any; language: string}) {
+    constructor({app, language}: {app: PreloginApp; language: string}) {
         super({app, language})
         this.title = gettext("Signup")
         if (this.app.settings?.REGISTRATION_OPEN) {
@@ -126,10 +126,10 @@ export class Signup extends PreloginPage {
                 return
             }
             const sendData: Record<string, unknown> = {username, password1, password2, email}
-            if ((this.app as any).inviteKey) {
-                sendData["invite_key"] = (this.app as any).inviteKey
+            if (this.app.inviteKey) {
+                sendData["invite_key"] = this.app.inviteKey
             }
-            (this.app as any).apiConnectors.auth.signup(sendData)
+            this.app.apiConnectors.auth.signup(sendData)
                 .then(({json}: any) => {
                     if (json.location === "/api/account/confirm-email/") {
                         fwContents.innerHTML = `<div class="fw-login-left">
@@ -150,7 +150,7 @@ export class Signup extends PreloginPage {
                         </div>`
                     } else {
                         window.history.pushState({}, "", "/")
-                        ;(this.app as any).init()
+                        this.app.init()
                     }
                 })
                 .catch((response: any) =>

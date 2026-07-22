@@ -1,14 +1,16 @@
 import {ensureCSS} from "fwtoolkit"
 
+import type {FrontendApp} from "../types.js"
+
 // Creates the feedback tab. The tab is meant for user feedback to the developers while FW is still in
 // a somewhat early stage. It is included in a way so it's easy to remove from all the templates.
 // This is also where browser sniffing happens to prevent still unsupported browsers from logging in.
 
 export class FeedbackTab {
     previousActiveElement: HTMLElement | null
-    app: any
+    app: FrontendApp
 
-    constructor(app?: any) {
+    constructor(app: FrontendApp) {
         this.previousActiveElement = null
         this.app = app
     }
@@ -116,7 +118,7 @@ export class FeedbackTab {
         closeFeedbackEl.style.display = "none"
         feedbackFormEl.style.visibility = "hidden"
 
-        ;(this.app as any).apiConnectors.feedback
+        this.app.apiConnectors.feedback
             .send({message: messageEl.value})
             .then(() => {
                 messageEl.value = ""

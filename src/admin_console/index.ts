@@ -1,11 +1,18 @@
 import {addAlert, findTarget, whenReady} from "fwtoolkit"
+import type {SystemMessageApi} from "../api/index.js"
+
+interface AdminConsoleApp {
+    apiConnectors: {
+        systemMessage: SystemMessageApi
+    }
+}
 
 // To see how many users are currently online and send them maintenance messages
 
 export class AdminConsole {
-    app: any
+    app: AdminConsoleApp
 
-    constructor(app: any) {
+    constructor(app: AdminConsoleApp) {
         this.app = app
     }
 

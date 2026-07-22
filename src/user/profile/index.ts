@@ -22,10 +22,11 @@ import {
     deleteSocialaccountDialog
 } from "./dialogs.js"
 import {profileContents} from "./templates.js"
+import type {FrontendApp, User} from "../../types.js"
 
 export class Profile {
-    app: any
-    user: Record<string, any>
+    app: FrontendApp
+    user: User & {id?: number}
     socialaccount_providers: Array<Record<string, unknown>>
     pluginTemplates: string[]
     clickTargets: Record<string, (el: Record<string, any>, event: Event) => void>
@@ -38,8 +39,8 @@ export class Profile {
         user,
         socialaccount_providers
     }: {
-        app: any
-        user: Record<string, any>
+        app: FrontendApp
+        user: User & {id?: number}
         socialaccount_providers: Array<Record<string, unknown>>
     }) {
         this.app = app
@@ -165,7 +166,7 @@ export class Profile {
                 this.app.settings,
                 this.pluginTemplates
             ),
-            user: this.user as any,
+            user: this.user,
             app: this.app
         })
         document.body = this.dom
@@ -175,7 +176,7 @@ export class Profile {
             staticUrl("css/two_factor.css")
         ])
 
-        setDocTitle(gettext("Configure profile"), this.app)
+        setDocTitle(gettext("Configure profile"), this.app as {name: string})
         const feedbackTab = new FeedbackTab(this.app)
         feedbackTab.init()
     }
@@ -258,7 +259,9 @@ export class Profile {
         setupPassphraseDialog(async (passphrase: string) => {
             try {
                 const {recoveryKey} =
-                    await PassphraseManager.setupEncryption(passphrase)
+                    await PassphraseManager.setupEncryption(
+                        passphrase
+                    )
                 const {showRecoveryKeyDialog} = await import(
                     "fwtoolkit/e2ee/passphrase-dialog"
                 )
@@ -329,8 +332,8 @@ export class Profile {
         activateWait()
         const newLang = (this.dom.querySelector("#language") as HTMLSelectElement).value
         const inlineReferences = (this.dom.querySelector("#inline-references") as HTMLInputElement).checked
-        const inlineMath = (this.dom.querySelector("#inline-math") as HTMLInputElement).checked;
-        (this.app as any).apiConnectors.userProfile.save({
+        const inlineMath = (this.dom.querySelector("#inline-math") as HTMLInputElement).checked
+        this.app.apiConnectors.userProfile.save({
             username: (this.dom.querySelector("#username") as HTMLInputElement).value,
             first_name: (this.dom.querySelector("#first_name") as HTMLInputElement).value,
             last_name: (this.dom.querySelector("#last_name") as HTMLInputElement).value,
@@ -338,7 +341,7 @@ export class Profile {
         })
             .catch(() => addAlert("error", gettext("Could not save profile data")))
             .then(() =>
-                (this.app as any).apiConnectors.userProfile.updatePreferences({
+                this.app.apiConnectors.userProfile.updatePreferences({
                     inline_references: inlineReferences,
                     inline_math: inlineMath
                 })

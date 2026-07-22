@@ -4,7 +4,7 @@ import {
     deactivateWait,
     whenReady
 } from "fwtoolkit"
-import {PreloginPage} from "../../prelogin/index.js"
+import {PreloginPage, type PreloginApp} from "../../prelogin/index.js"
 import {
     checkTermsTemplate,
     confirmAccountTemplate,
@@ -25,7 +25,7 @@ export class EmailConfirm extends PreloginPage {
     confirmMethods: Array<() => Promise<unknown>>
     firstVerification: boolean
 
-    constructor({app, language}: {app: any; language: string}, key: string) {
+    constructor({app, language}: {app: PreloginApp; language: string}, key: string) {
         super({app, language})
 
         this.title = gettext("Confirm Email")
@@ -43,7 +43,7 @@ export class EmailConfirm extends PreloginPage {
         this.formChecks = []
         this.confirmQuestionsTemplates = []
         this.confirmMethods = [
-            () => (this.app as any).apiConnectors.userProfile.confirmEmail(this.key)
+            () => this.app.apiConnectors.userProfile.confirmEmail(this.key)
         ]
         this.firstVerification = false
     }
@@ -57,7 +57,7 @@ export class EmailConfirm extends PreloginPage {
     }
 
     getConfirmData(): Promise<void> {
-        return (this.app as any).apiConnectors.userProfile.getConfirmKeyData({key: this.key})
+        return this.app.apiConnectors.userProfile.getConfirmKeyData({key: this.key})
             .then((json: any) => {
                 this.username = json.username
                 this.email = json.email
@@ -65,7 +65,7 @@ export class EmailConfirm extends PreloginPage {
                 this.verified = json.verified
                 this.firstVerification = !json.verified
                 if (json.logout) {
-                    this.app.config.user = {is_authenticated: false}
+                    this.app.config.user = {is_authenticated: false} as PreloginApp["user"]
                 }
             })
             .catch(() => {})
@@ -127,23 +127,23 @@ export class EmailConfirm extends PreloginPage {
                 activateWait()
                 Promise.all(this.confirmMethods.map(method => method())).then(() => {
                     deactivateWait()
-                if ((this.app.config as any).user.is_authenticated) {
-                    const emailObject = (this.app.config as any).user.emails.find(
-                        (email: any) => email.address === this.email
-                    )
-                    if (emailObject) {
-                        emailObject.verified = true
-                    }
-                    return (this.app.goTo("/user/profile/") as any)
-                        .then(() =>
-                            addAlert("info", gettext("Email verified!"))
+                    if (this.app.config.user.is_authenticated) {
+                        const emailObject = this.app.config.user.emails.find(
+                            email => email.address === this.email
                         )
-                    } else {
-                        const contentsDOM = document.querySelector(".fw-contents")
-                        if (contentsDOM) {
-                            contentsDOM.innerHTML = verifiedAccountTemplate()
+                        if (emailObject) {
+                            emailObject.verified = true
                         }
+                        return this.app.goTo("/user/profile/")
+                            .then(() =>
+                                addAlert("info", gettext("Email verified!"))
+                            )
                     }
+                    const contentsDOM = document.querySelector(".fw-contents")
+                    if (contentsDOM) {
+                        contentsDOM.innerHTML = verifiedAccountTemplate()
+                    }
+                    return undefined
                 })
             })
         }

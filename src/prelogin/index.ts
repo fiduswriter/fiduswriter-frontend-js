@@ -1,6 +1,6 @@
 import {ensureCSS, setDocTitle, setLanguage, whenReady} from "fwtoolkit"
 import {FeedbackTab} from "../feedback/index.js"
-import type {RouteMap, Settings} from "../types.js"
+import type {FrontendApp} from "../types.js"
 
 import {basePreloginTemplate} from "./templates.js"
 
@@ -16,12 +16,8 @@ interface HeaderLink {
     link: string
 }
 
-export interface PreloginApp {
-    routes: RouteMap
-    settings: Settings
-    goTo: (url: string) => void
-    name: string
-    config: Record<string, unknown>
+export interface PreloginApp extends FrontendApp {
+    config: FrontendApp
 }
 
 interface PluginExport {
@@ -168,7 +164,7 @@ export class PreloginPage {
         })
         document.body = this.dom
         ensureCSS([staticUrl("css/prelogin.css")])
-        setDocTitle(this.title, this.app)
+        setDocTitle(this.title, this.app as {name: string})
         const feedbackTab = new FeedbackTab(this.app)
         feedbackTab.init()
     }

@@ -17,6 +17,7 @@ import {PassphraseManager} from "fwtoolkit/e2ee/passphrase-manager"
 import {createPasswordDialog, enterPasswordDialog} from "fwtoolkit/e2ee/password-dialog"
 
 import type {DocumentOverview} from "./index.js"
+import type {FrontendApp} from "../../types.js"
 import {documentDialogTemplate, importDocumentTemplate} from "./templates.js"
 
 const exportProgressCallback = (doc: Record<string, unknown>) => {
@@ -96,7 +97,9 @@ export class DocumentOverviewActions {
             newContactCall: ((memberDetails: Record<string, unknown>) =>
                 this.documentOverview.contacts.push(memberDetails as any)) as any,
             e2ee: doc.e2ee as boolean,
-            settings: this.documentOverview.app.settings
+            settings: this.documentOverview.app.settings,
+            documentApi: this.documentOverview.app.apiConnectors.document,
+            contactsApi: this.documentOverview.app.apiConnectors.contacts
         })
         this.accessRightsTab
             .load()
@@ -124,7 +127,7 @@ export class DocumentOverviewActions {
             return Promise.resolve()
         }
         const displayTitle = getDisplayTitle(doc)
-        return (this.documentOverview.app as any).apiConnectors.documentList.deleteDocument({id}).then((json: any) => {
+        return this.documentOverview.app.apiConnectors.document.deleteDocument({id}).then((json: any) => {
             if ((json as any).done) {
                 addAlert(
                     "success",
@@ -142,7 +145,7 @@ export class DocumentOverviewActions {
         })
     }
 
-    deleteDocumentDialog(ids: number[], app: any): void {
+    deleteDocumentDialog(ids: number[], app: FrontendApp): void {
         if (app.isOffline()) {
             addAlert(
                 "info",
@@ -295,12 +298,12 @@ export class DocumentOverviewActions {
                             if (isFidus) {
                                 const importer = new FidusFileImporter(
                                     file!,
-                                    this.documentOverview.user,
+                                    this.documentOverview.user as unknown as Record<string, unknown>,
                                     this.documentOverview.path,
                                     true,
                                     this.documentOverview.contacts,
                                     e2eeOptions,
-                                    (this.documentOverview.app as any).apiConnectors
+                                    this.documentOverview.app.apiConnectors
                                 )
 
                                 try {
@@ -375,7 +378,7 @@ export class DocumentOverviewActions {
                                 bibDB: this.documentOverview.app.bibDB,
                                 files: {},
                                 e2eeOptions,
-                                apiConnectors: (this.documentOverview.app as any).apiConnectors
+                                apiConnectors: this.documentOverview.app.apiConnectors
                             }
 
                             const importer = new importerInfo.importer(
@@ -422,7 +425,13 @@ export class DocumentOverviewActions {
                                 const doc = await doImport(e2eeOptions)
                                 if (doc?.id) {
                                     try {
-                                        await PassphraseManager.saveDocumentPassword(doc.id, password)
+                                        await PassphraseManager.saveDocumentPassword(
+                                            doc.id,
+                                            password,
+                                            null as any,
+                                            "user",
+                                            true
+                                        )
                                     } catch (err) {
                                         console.error(
                                             "Failed to save document password for imported document:",
@@ -455,7 +464,9 @@ export class DocumentOverviewActions {
                                     if (result?.action === "unlock" && result.passphrase) {
                                         activateWait()
                                         try {
-                                            await PassphraseManager.unlockWithPassphrase(result.passphrase)
+                                            await PassphraseManager.unlockWithPassphrase(
+                                                result.passphrase
+                                            )
                                             await importWithAutoPassword()
                                             done = true
                                         } catch (err: any) {
@@ -540,7 +551,7 @@ export class DocumentOverviewActions {
                 ids,
                 this.documentOverview.documentList as any,
                 this.documentOverview.schema,
-                (this.documentOverview.app as any).apiConnectors.documentList
+                this.documentOverview.app.apiConnectors.document
             ).then(() => {
                 ids.forEach(id => {
                     const doc = this.documentOverview.documentList.find(
@@ -551,7 +562,10 @@ export class DocumentOverviewActions {
                         doc,
                         {db: doc.bibliography as any},
                         {db: doc.images as any},
-                        this.documentOverview.user as any
+                        this.documentOverview.user as any,
+                        null,
+                        null,
+                        this.documentOverview.app.apiConnectors.documentImport
                     )
 
                     copier
@@ -572,7 +586,7 @@ export class DocumentOverviewActions {
                 ids,
                 this.documentOverview.documentList as any,
                 this.documentOverview.schema,
-                (this.documentOverview.app as any).apiConnectors.documentList
+                this.documentOverview.app.apiConnectors.document
             ).then(() => {
                 const docs = ids.map(id =>
                     this.documentOverview.documentList.find(entry => entry.id === id)
@@ -647,7 +661,9 @@ export class DocumentOverviewActions {
                                             (selectTemplateDialog.dialogEl.querySelector(
                                                 "select"
                                             ) as HTMLSelectElement).value,
-                                            e2eeOptions
+                                            e2eeOptions,
+                                            this.documentOverview.app
+                                                .apiConnectors.documentImport
                                         )
 
                                         copier
@@ -727,12 +743,17 @@ export class DocumentOverviewActions {
                 ids,
                 this.documentOverview.documentList as any,
                 this.documentOverview.schema,
-                (this.documentOverview.app as any).apiConnectors.documentList
+                this.documentOverview.app.apiConnectors.document
             ).then(() =>
                 ids.forEach(id => {
                     const doc = this.documentOverview.documentList.find(entry => entry.id === id)
                     if (!doc) return
-                    new ExportFidusFile(doc as any, {db: doc.bibliography as any}, {db: doc.images as any})
+                    new ExportFidusFile(
+                        this.documentOverview.app,
+                        doc as any,
+                        {db: doc.bibliography as any},
+                        {db: doc.images as any}
+                    )
                 })
             )
         })
@@ -744,12 +765,18 @@ export class DocumentOverviewActions {
                 ids,
                 this.documentOverview.documentList as any,
                 this.documentOverview.schema,
-                (this.documentOverview.app as any).apiConnectors.documentList
+                this.documentOverview.app.apiConnectors.document
             ).then(() =>
                 ids.forEach(id => {
                     const doc = this.documentOverview.documentList.find(entry => entry.id === id)
                     if (!doc) return
-                    new ExportFidusFile(doc as any, {db: doc.bibliography as any}, {db: doc.images as any}, false)
+                    new ExportFidusFile(
+                        this.documentOverview.app,
+                        doc as any,
+                        {db: doc.bibliography as any},
+                        {db: doc.images as any},
+                        false
+                    )
                 })
             )
         })
@@ -761,7 +788,7 @@ export class DocumentOverviewActions {
                 ids,
                 this.documentOverview.documentList as any,
                 this.documentOverview.schema,
-                (this.documentOverview.app as any).apiConnectors.documentList
+                this.documentOverview.app.apiConnectors.document
             ).then(() =>
                 ids.forEach(id => {
                     const doc = this.documentOverview.documentList.find(entry => entry.id === id)
@@ -796,7 +823,7 @@ export class DocumentOverviewActions {
                 ids,
                 this.documentOverview.documentList as any,
                 this.documentOverview.schema,
-                (this.documentOverview.app as any).apiConnectors.documentList
+                this.documentOverview.app.apiConnectors.document
             ).then(() => {
                 ids.forEach(id => {
                     const doc = this.documentOverview.documentList.find(entry => entry.id === id)
@@ -842,7 +869,7 @@ export class DocumentOverviewActions {
                 ids,
                 this.documentOverview.documentList as any,
                 this.documentOverview.schema,
-                (this.documentOverview.app as any).apiConnectors.documentList
+                this.documentOverview.app.apiConnectors.document
             ).then(() =>
                 ids.forEach(id => {
                     const doc = this.documentOverview.documentList.find(entry => entry.id === id)
@@ -871,7 +898,7 @@ export class DocumentOverviewActions {
                 ids,
                 this.documentOverview.documentList as any,
                 this.documentOverview.schema,
-                (this.documentOverview.app as any).apiConnectors.documentList
+                this.documentOverview.app.apiConnectors.document
             ).then(() =>
                 ids.forEach(id => {
                     const doc = this.documentOverview.documentList.find(entry => entry.id === id)
@@ -902,7 +929,7 @@ export class DocumentOverviewActions {
                 ids,
                 this.documentOverview.documentList as any,
                 this.documentOverview.schema,
-                (this.documentOverview.app as any).apiConnectors.documentList
+                this.documentOverview.app.apiConnectors.document
             ).then(() =>
                 ids.forEach(id => {
                     const doc = this.documentOverview.documentList.find(entry => entry.id === id)
@@ -933,7 +960,7 @@ export class DocumentOverviewActions {
                 ids,
                 this.documentOverview.documentList as any,
                 this.documentOverview.schema,
-                (this.documentOverview.app as any).apiConnectors.documentList
+                this.documentOverview.app.apiConnectors.document
             ).then(() =>
                 ids.forEach(id => {
                     const doc = this.documentOverview.documentList.find(entry => entry.id === id)
@@ -995,7 +1022,7 @@ export class DocumentOverviewActions {
         dialogTabs.bind(dialog.dialogEl.querySelector("#documentoptions-tab")!)
     }
 
-    revisionsDialog(documentId: number, app: any): void {
+    revisionsDialog(documentId: number, app: FrontendApp): void {
         if (app.isOffline()) {
             addAlert(
                 "info",
@@ -1009,8 +1036,8 @@ export class DocumentOverviewActions {
             const revDialog = new DocumentRevisionsDialog(
                 documentId,
                 this.documentOverview.documentList,
-                this.documentOverview.user,
-                (this.documentOverview.app as any).apiConnectors
+                this.documentOverview.user as unknown as Record<string, unknown>,
+                this.documentOverview.app.apiConnectors
             )
             revDialog.init().then((actionObject: any) => {
                 switch (actionObject.action) {

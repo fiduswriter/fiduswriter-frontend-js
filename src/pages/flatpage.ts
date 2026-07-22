@@ -23,12 +23,12 @@ export class FlatPage extends PreloginPage {
     }
 
     getPageData(): Promise<void> {
-        return (this.app as any).apiConnectors.flatPage.get(this.url)
-            .then((data: any) => {
-                this.title = data.title
+        return this.app.apiConnectors.flatPage.get(this.url)
+            .then((data: Record<string, unknown>) => {
+                this.title = data.title as string
                 this.contents = `<div class="fw-flatpage">
                     <h1 class="fw-login-title">${data.title}</h1>
-                    ${data.content}
+                    ${data.content as string}
                 </div>`
             })
             .catch(() => {

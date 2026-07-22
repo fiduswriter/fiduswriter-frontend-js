@@ -1,4 +1,5 @@
 import StackTrace from "stacktrace-js"
+import type {ErrorHookApi} from "../api/index.js"
 
 interface CsrfSettings {
     getCsrfToken(): string
@@ -10,8 +11,18 @@ declare global {
     }
 }
 
+interface ErrorHookApp {
+    apiConnectors: {
+        errorHook: ErrorHookApi
+    }
+}
+
 export class ErrorHook {
-    constructor() {}
+    app: ErrorHookApp
+
+    constructor(app: ErrorHookApp) {
+        this.app = app
+    }
 
     init(): void {
         window.onerror = (
@@ -29,20 +40,14 @@ export class ErrorHook {
     }
 
     sendLog(details: string): void {
-        const body = new FormData()
-        body.append("context", navigator.userAgent)
-        body.append("details", details)
-
-        fetch("/api/django_js_error_hook/", {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": window.settings.getCsrfToken()
-            },
-            credentials: "include",
-            body
-        }).catch(error => {
-            console.warn(error)
-        })
+        this.app.apiConnectors.errorHook
+            .send({
+                context: navigator.userAgent,
+                details
+            })
+            .catch(error => {
+                console.warn(error)
+            })
     }
 
     onError(

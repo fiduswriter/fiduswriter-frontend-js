@@ -23,7 +23,7 @@ export class DocTemplatesActions {
             return
         }
 
-        ;(this.docTemplatesOverview.app as any).apiConnectors.documentTemplate.delete({id})
+        this.docTemplatesOverview.app.apiConnectors.documentTemplate.delete({id})
             .catch((error: Error) => {
                 addAlert(
                     "error",
@@ -73,9 +73,9 @@ export class DocTemplatesActions {
     }
 
     copyDocTemplate(oldDocTemplate: Record<string, unknown>): void {
-        ;(this.docTemplatesOverview.app as any).apiConnectors.documentTemplate.copy({
-            id: oldDocTemplate.id,
-            title: `${gettext("Copy of")} ${oldDocTemplate.title}`
+        this.docTemplatesOverview.app.apiConnectors.documentTemplate.copy({
+            id: oldDocTemplate.id as number,
+            title: `${gettext("Copy of")} ${oldDocTemplate.title as string}`
         })
             .catch((error: Error) => {
                 addAlert("error", gettext("The document template could not be copied"))
@@ -94,7 +94,7 @@ export class DocTemplatesActions {
     downloadDocTemplate(id: number): void {
         const exporter = new DocumentTemplateExporter(
             id,
-            "/api/user_template_manager/get/"
+            this.docTemplatesOverview.app.apiConnectors.documentTemplate
         )
         exporter.init()
     }
@@ -120,7 +120,7 @@ export class DocTemplatesActions {
 
                     const importer = new DocumentTemplateImporter(
                         file,
-                        "/api/user_template_manager/create/"
+                        this.docTemplatesOverview.app.apiConnectors.documentTemplate
                     )
 
                     importer

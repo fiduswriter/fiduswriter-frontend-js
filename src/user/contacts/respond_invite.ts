@@ -1,18 +1,19 @@
 import {Dialog, escapeText} from "fwtoolkit"
+import type {FrontendApp} from "../../types.js"
 
 export class RespondInviteDialog {
     invites: Array<Record<string, unknown>>
     addCallback: (contacts: Array<Record<string, unknown>>) => void
     deleteCallback: (invites: Array<Record<string, unknown>>) => void
     doneCallback: () => void
-    app: any
+    app: FrontendApp
 
     constructor(
         invites: Array<Record<string, unknown>>,
         addCallback: (contacts: Array<Record<string, unknown>>) => void = () => {},
         deleteCallback: (invites: Array<Record<string, unknown>>) => void = () => {},
         doneCallback: () => void = () => {},
-        app?: any
+        app: FrontendApp
     ) {
         this.invites = invites
         this.addCallback = addCallback

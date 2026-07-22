@@ -48,7 +48,7 @@ export const bulkMenuModel = (): MenuModel => ({
                         movingFiles: docs,
                         allFiles: overview.documentList,
                         moveFunction: (id: number, _title: string, path: string) =>
-                            (overview.app as any).apiConnectors.documentList.moveDocument({
+                            overview.app.apiConnectors.document.moveDocument({
                                 id,
                                 path
                             }),
@@ -96,7 +96,9 @@ export const bulkMenuModel = (): MenuModel => ({
                         e2ee,
                         "",
                         null as any,
-                        overview.app.settings
+                        overview.app.settings,
+                        overview.app.apiConnectors.contacts,
+                        overview.app.apiConnectors.document
                     )
                     dialog.init()
                 }

@@ -1,8 +1,8 @@
 import {escapeText} from "fwtoolkit"
-import {PreloginPage} from "../../prelogin/index.js"
+import {PreloginPage, type PreloginApp} from "../../prelogin/index.js"
 
 export class PasswordResetRequest extends PreloginPage {
-    constructor({app, language}: {app: any; language: string}) {
+    constructor({app, language}: {app: PreloginApp; language: string}) {
         super({app, language})
         this.title = gettext("Reset Password")
     }
@@ -66,7 +66,7 @@ export class PasswordResetRequest extends PreloginPage {
                     return
                 }
 
-                ;(this.app as any).apiConnectors.auth.passwordReset({email})
+                this.app.apiConnectors.auth.passwordReset({email})
                     .then(() => {
                         if (document.body !== this.dom) {
                             return
