@@ -195,9 +195,9 @@
   },
   "dependencies": {
     "@fiduswriter/bibliography-manager": "^0.1.25",
-    "@fiduswriter/document": "^0.2.32",
-    "@fiduswriter/document-template-editor": "^0.1.12",
-    "@fiduswriter/editor": "^0.1.54",
+    "@fiduswriter/document": "^0.2.33",
+    "@fiduswriter/document-template-editor": "^0.1.13",
+    "@fiduswriter/editor": "^0.1.55",
     "@fiduswriter/image-manager": "^0.1.19",
     "downloadjs": "^1.4.7",
     "fwtoolkit": "^0.2.4",

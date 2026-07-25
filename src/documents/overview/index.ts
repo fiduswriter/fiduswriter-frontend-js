@@ -127,8 +127,8 @@ export class DocumentOverview {
         ensureCSS([
             staticUrl("css/document_overview.css"),
             staticUrl("css/add_remove_dialog.css"),
-            staticUrl("css/access_rights_dialog.css"),
-            staticUrl("css/e2ee.css")
+            staticUrl("css/editor/access_rights_dialog.css"),
+            staticUrl("css/editor/e2ee.css")
         ])
         document.body = this.dom
         setDocTitle(gettext("Document Overview"), this.app as {name: string})

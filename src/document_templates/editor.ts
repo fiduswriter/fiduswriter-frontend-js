@@ -40,7 +40,7 @@ export class DocTemplatesEditor {
     init(): Promise<void> {
         ensureCSS([
             staticUrl("css/errorlist.css"),
-            staticUrl("css/editor.css"),
+            staticUrl("css/editor/editor.css"),
             staticUrl("css/user_template_manager.css")
         ])
         return this.app.csl
