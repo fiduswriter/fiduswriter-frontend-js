@@ -2,9 +2,21 @@
   "name": "@fiduswriter/frontend",
   "version": "0.1.36",
   "description": "Fidus Writer-specific shared utilities and UI chrome",
+  "keywords": [
+    "fiduswriter",
+    "frontend",
+    "spa",
+    "router",
+    "ui",
+    "browser"
+  ],
+  "homepage": "https://codeberg.org/fiduswriter/fiduswriter-frontend-js#readme",
+  "bugs": {
+    "url": "https://codeberg.org/fiduswriter/fiduswriter-frontend-js/issues"
+  },
   "repository": {
     "type": "git",
-    "url": "ssh://git@codeberg.org/fiduswriter/fiduswriter-common-js.git"
+    "url": "ssh://git@codeberg.org/fiduswriter/fiduswriter-frontend-js.git"
   },
   "license": "AGPL-3.0",
   "author": "Johannes Wilm",
