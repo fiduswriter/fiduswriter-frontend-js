@@ -13,7 +13,6 @@ export const importDocumentTemplate = ({
     supportedFormatsText?: string
 }): string =>
     `<form>
-        ${templateSelector}
         <div class="fw-select-container">
             <div class="fw-select-head">
                 <button type="button" class="fw-button fw-light fw-large" id="import-doc-btn">
@@ -22,6 +21,9 @@ export const importDocumentTemplate = ({
                 <label id="import-doc-name" class="ajax-upload-label"></label>
             </div>
             <input id="doc-uploader" type="file" accept=".fidus,.docx,.odt,.json,.zip" style="display: none;">
+        </div>
+        <div id="import-template-selector-container" style="display: none;">
+            ${templateSelector}
         </div>
         ${e2eeHtml}
     </form>

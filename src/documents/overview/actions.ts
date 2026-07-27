@@ -256,7 +256,7 @@ export class DocumentOverviewActions {
                     `${description} (${(extensions as string[]).join(", ")})`
             )
             .join("<br>")
-        const supportedFormatsText = `${gettext("Supported formats")}:<p>FIDUS<br>${supportedDescriptions}</p><p>${gettext("You can also upload a ZIP file that contains one file in any of these formats as well as images and/or bibtex file.")}</p>`
+        const supportedFormatsText = `${gettext("Supported formats")}:<p>FIDUS (.fidus)<br>${supportedDescriptions}</p><p>${gettext("You can also upload a ZIP file that contains one file in any of these formats as well as images and/or bibtex file.")}</p>`
 
         const {FidusFileImporter} = await import("../importer/native/file.js")
 
@@ -525,12 +525,29 @@ export class DocumentOverviewActions {
         const uploader = document.getElementById("doc-uploader")
         if (uploader) {
             uploader.addEventListener("change", () => {
+                const fileInput = uploader as HTMLInputElement
                 const nameEl = document.getElementById("import-doc-name")
                 if (nameEl) {
-                    nameEl.innerHTML = (uploader as HTMLInputElement).value.replace(
+                    nameEl.innerHTML = fileInput.value.replace(
                         /C:\\fakepath\\/i,
                         ""
                     )
+                }
+                const templateContainer = document.getElementById(
+                    "import-template-selector-container"
+                )
+                if (templateContainer) {
+                    const selectedFile = fileInput.files?.[0]
+                    if (selectedFile) {
+                        const extension = selectedFile.name
+                            .split(".")
+                            .pop()
+                            ?.toLowerCase()
+                        templateContainer.style.display =
+                            extension === "fidus" ? "none" : "block"
+                    } else {
+                        templateContainer.style.display = "none"
+                    }
                 }
             })
         }
