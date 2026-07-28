@@ -90,7 +90,7 @@ export function createNativeImporterBackend(
             const isE2EE = e2ee?.enabled
             const ImageTranslationTable: ImageTranslationTable = {}
             await Promise.all(
-                Object.values(images.db as Record<string, any>).map(async (imageEntry: any) => {
+                Object.entries(images.db as Record<string, any>).map(async ([oldId, imageEntry]: [string, any]) => {
                     await maybeDecryptImage(imageEntry, e2ee?.sourceKey)
                     const encryptedFile =
                         e2ee?.enabled && e2ee.key
@@ -114,7 +114,7 @@ export function createNativeImporterBackend(
                     const result: any = isE2EE
                         ? await apiConnectors.documentImport.saveE2EEImage(jsonData, files as any)
                         : await apiConnectors.documentImport.saveImage(jsonData, files as any)
-                    ImageTranslationTable[imageEntry.id] = result.json.id
+                    ImageTranslationTable[oldId] = result.json.id
                 })
             )
             return ImageTranslationTable
