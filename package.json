@@ -209,10 +209,10 @@
     "@fiduswriter/bibliography-manager": "^0.1.28",
     "@fiduswriter/document": "^0.2.37",
     "@fiduswriter/document-template-editor": "^0.1.15",
-    "@fiduswriter/editor": "^0.1.68",
+    "@fiduswriter/editor": "^0.1.70",
     "@fiduswriter/image-manager": "^0.1.22",
     "downloadjs": "^1.4.7",
-    "fwtoolkit": "^0.2.5",
+    "fwtoolkit": "^0.2.6",
     "jszip": "^3.10.1",
     "prosemirror-history": "^1.3.2",
     "prosemirror-keymap": "^1.2.2",
@@ -244,6 +244,7 @@
   "fiduswriter": {
     "css": {
       "fwtoolkit": [
+        "reset.css",
         "colors.css",
         "forms.css",
         "buttons.css",
@@ -275,7 +276,6 @@
           "forms.css"
         ],
         "component": [
-          "reset.css",
           "fonts.css",
           "text.css",
           "figure.css",

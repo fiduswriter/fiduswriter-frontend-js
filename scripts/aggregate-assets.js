@@ -169,7 +169,7 @@ const manifest = {
 }
 
 // Layer 0: Reset
-manifest.reset.push("@fiduswriter/frontend/css/reset.css")
+manifest.reset.push("fwtoolkit/css/reset.css")
 
 // Layer 1: Tokens (fwtoolkit colors base)
 manifest.tokens.push("fwtoolkit/css/colors.css")
@@ -184,9 +184,12 @@ manifest.typography.push(
 const allFwtCss = readdirSync(join(root, "node_modules", "fwtoolkit", "css")).filter(
     (f) => f.endsWith(".css")
 )
-// Remove colors.css (already in tokens), common.css (goes in components)
+// Remove colors.css (already in tokens), common.css (goes in components),
+// and reset.css (already in the reset layer)
 const fwtComponents = allFwtCss
-    .filter((f) => f !== "colors.css" && f !== "fwtoolkit.css")
+    .filter(
+        (f) => f !== "colors.css" && f !== "fwtoolkit.css" && f !== "reset.css"
+    )
     .map((f) => `fwtoolkit/css/${f}`)
 manifest.components.push(...fwtComponents)
 
