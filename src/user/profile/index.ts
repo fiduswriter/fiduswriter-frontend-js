@@ -265,8 +265,7 @@ export class Profile {
                 const {showRecoveryKeyDialog} = await import(
                     "fwtoolkit/e2ee/passphrase-dialog"
                 )
-                // @ts-ignore
-                await showRecoveryKeyDialog(recoveryKey)
+                await showRecoveryKeyDialog(recoveryKey, () => {})
                 this.updateE2EEPassphraseStatus()
             } catch (e: any) {
                 addAlert("error", gettext("Failed to set up passphrase: ") + e.message)

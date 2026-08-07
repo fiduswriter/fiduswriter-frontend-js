@@ -924,9 +924,9 @@ export class DocumentOverview {
                                                         await import(
                                                             "fwtoolkit/e2ee/passphrase-dialog"
                                                         )
-                                                    // @ts-ignore
                                                     await showRecoveryKeyDialog(
-                                                        recoveryKey
+                                                        recoveryKey,
+                                                        () => {}
                                                     )
                                                 } catch (e: any) {
                                                     addAlert(
