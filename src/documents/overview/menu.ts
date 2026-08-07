@@ -97,6 +97,7 @@ export const bulkMenuModel = (): MenuModel => ({
                         "",
                         null as any,
                         overview.app.settings,
+                        true,
                         overview.app.apiConnectors.contacts,
                         overview.app.apiConnectors.document
                     )

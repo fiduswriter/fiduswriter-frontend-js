@@ -99,7 +99,8 @@ export class DocumentOverviewActions {
             e2ee: doc.e2ee as boolean,
             settings: this.documentOverview.app.settings,
             documentApi: this.documentOverview.app.apiConnectors.document,
-            contactsApi: this.documentOverview.app.apiConnectors.contacts
+            contactsApi: this.documentOverview.app.apiConnectors.contacts,
+            isOwner: doc.is_owner as boolean
         })
         this.accessRightsTab
             .load()

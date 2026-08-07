@@ -209,7 +209,7 @@
     "@fiduswriter/bibliography-manager": "^0.1.28",
     "@fiduswriter/document": "^0.2.38",
     "@fiduswriter/document-template-editor": "^0.1.15",
-    "@fiduswriter/editor": "^0.1.75",
+    "@fiduswriter/editor": "^0.1.76",
     "@fiduswriter/image-manager": "^0.1.22",
     "downloadjs": "^1.4.7",
     "fwtoolkit": "^0.2.6",
